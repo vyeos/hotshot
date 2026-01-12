@@ -14,14 +14,12 @@ const page = () => {
     username: string,
     shouldHash: boolean,
     password: string,
-    confirm: string,
   ) => {
     try {
-      const user = await convex.mutation(api.auth.signUp, {
+      const user = await convex.action(api.auth.signUp, {
         username,
         shouldHash,
         password,
-        confirm,
       });
 
       if (!user) {
@@ -42,12 +40,7 @@ const page = () => {
       confirm: "",
     },
     onSubmit: async ({ value }) => {
-      await handleSubmit(
-        value.username,
-        value.shouldHash,
-        value.password,
-        value.confirm,
-      );
+      await handleSubmit(value.username, value.shouldHash, value.password);
     },
   });
 

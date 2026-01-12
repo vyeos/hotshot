@@ -1,31 +1,34 @@
+import { query, action } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
-import { createNewUserUtil } from "./utils";
+import bcrypt from "bcryptjs";
+import { Doc } from "./_generated/dataModel";
 
-export const signUp = mutation({
+export const signUp = action({
   args: {
     username: v.string(),
     shouldHash: v.boolean(),
     password: v.string(),
-    confirm: v.string(),
   },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .unique();
+  handler: async (ctx, args): Promise<Doc<"users"> | null> => {
+    const taken = await ctx.runQuery(internal.users.checkUsername, {
+      username: args.username,
+    });
+    if (taken) throw new Error("Username already taken");
 
-    if (existing) {
-      throw new Error("Username already taken");
+    let finalPassword = args.password;
+    if (args.shouldHash) {
+      const salt = await bcrypt.genSalt(10);
+      finalPassword = await bcrypt.hash(args.password, salt);
     }
 
-    const newUserDoc = createNewUserUtil({
+    const user = await ctx.runMutation(internal.users.createUser, {
       username: args.username,
-      password: args.password,
+      password: finalPassword,
       shouldHash: args.shouldHash,
     });
-    const newUserId = await ctx.db.insert("users", newUserDoc);
-    return await ctx.db.get(newUserId);
+
+    return user;
   },
 });
 

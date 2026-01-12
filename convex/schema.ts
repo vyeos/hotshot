@@ -25,7 +25,7 @@ export default defineSchema({
     .index("by_drop", ["drop_id"])
     .index("by_drop_and_score", ["drop_id", "total_tributes"]),
 
-  enery_transactions: defineTable({
+  tributes_given: defineTable({
     user_id: v.id("users"),
     image_id: v.id("images"),
     tributes: v.number(),
