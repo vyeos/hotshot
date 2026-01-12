@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { ConvexError } from "convex/values";
 
 const page = () => {
   const convex = useConvex();
@@ -15,7 +16,7 @@ const page = () => {
       return;
     }
     try {
-      const user = await convex.query(api.users.getUser, {
+      const user = await convex.action(api.auth.login, {
         username,
         password,
       });
@@ -27,6 +28,12 @@ const page = () => {
       console.log(user);
     } catch (error) {
       console.error("Login failed:", error);
+
+      if (error instanceof ConvexError) {
+        alert(error.data);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
 

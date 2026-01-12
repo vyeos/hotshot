@@ -1,6 +1,6 @@
-import { query, action } from "./_generated/server";
+import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import bcrypt from "bcryptjs";
 import { Doc } from "./_generated/dataModel";
 
@@ -11,7 +11,7 @@ export const signUp = action({
     password: v.string(),
   },
   handler: async (ctx, args): Promise<Doc<"users"> | null> => {
-    const taken = await ctx.runQuery(internal.users.checkUsername, {
+    const taken = await ctx.runQuery(internal.users.getUserByUsername, {
       username: args.username,
     });
     if (taken) throw new Error("Username already taken");
@@ -32,17 +32,23 @@ export const signUp = action({
   },
 });
 
-export const login = query({
+export const login = action({
   args: { username: v.string(), password: v.string() },
-  handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .unique();
+  handler: async (ctx, args): Promise<Doc<"users"> | null> => {
+    const user = await ctx.runQuery(internal.users.getUserByUsername, {
+      username: args.username,
+    });
 
-    if (!user) return null;
+    const GENERIC_ERROR = "Invalid username or password";
 
-    if (user.password !== args.password) return null;
+    if (!user) throw new ConvexError(GENERIC_ERROR);
+
+    if (user.shouldHash) {
+      const isMatch = await bcrypt.compare(args.password, user.password);
+      if (!isMatch) throw new ConvexError(GENERIC_ERROR);
+    } else {
+      if (user.password !== args.password) throw new ConvexError(GENERIC_ERROR);
+    }
 
     return user;
   },

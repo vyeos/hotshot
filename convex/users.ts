@@ -1,16 +1,6 @@
 import { internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 
-export const checkUsername = internalQuery({
-  args: { username: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("users")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .unique();
-  },
-});
-
 export const createUser = internalMutation({
   args: {
     username: v.string(),
@@ -36,5 +26,15 @@ export const createUser = internalMutation({
       isVirgin: false,
     });
     return await ctx.db.get(newUserId);
+  },
+});
+
+export const getUserByUsername = internalQuery({
+  args: { username: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .unique();
   },
 });

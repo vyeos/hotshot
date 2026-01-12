@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { api } from "@/convex/_generated/api";
 import { useForm } from "@tanstack/react-form";
 import { useConvex } from "convex/react";
+import { ConvexError } from "convex/values";
 import Link from "next/link";
 import z from "zod";
 
@@ -29,6 +30,12 @@ const page = () => {
       console.log(user);
     } catch (error) {
       console.error("Login failed:", error);
+
+      if (error instanceof ConvexError) {
+        alert(error.data);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
 
