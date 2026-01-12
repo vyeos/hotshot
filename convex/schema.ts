@@ -5,6 +5,7 @@ export default defineSchema({
   users: defineTable({
     username: v.string(),
     password: v.string(),
+    shouldHash: v.boolean(),
     daily_allowance: v.int64(),
     energy: v.int64(),
     isVirgin: v.boolean(),
