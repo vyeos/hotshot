@@ -6,8 +6,8 @@ export default defineSchema({
     username: v.string(),
     password: v.string(),
     shouldHash: v.boolean(),
-    daily_allowance: v.int64(),
-    energy: v.int64(),
+    daily_allowance: v.number(),
+    energy: v.number(),
     isVirgin: v.boolean(),
   }).index("by_username", ["username"]),
 
@@ -18,9 +18,9 @@ export default defineSchema({
 
   images: defineTable({
     drop_id: v.id("daily_drops"),
-    sequence_idx: v.int64(),
+    sequence_idx: v.number(),
     url: v.string(),
-    total_tributes: v.int64(),
+    total_tributes: v.number(),
   })
     .index("by_drop", ["drop_id"])
     .index("by_drop_and_score", ["drop_id", "total_tributes"]),
@@ -28,8 +28,8 @@ export default defineSchema({
   enery_transactions: defineTable({
     user_id: v.id("users"),
     image_id: v.id("images"),
-    tributes: v.int64(),
-    timestamp: v.int64(),
+    tributes: v.number(),
+    timestamp: v.number(),
   })
     .index("by_image", ["image_id"])
     .index("by_user", ["user_id"]),
