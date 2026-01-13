@@ -10,7 +10,7 @@ import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
 
 const page = () => {
-  const [isShaking, setShake] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const [errors, setErrors] = useState("");
   const convex = useConvex();
 
@@ -33,7 +33,8 @@ const page = () => {
     } catch (error) {
       console.error("Login failed:", error);
 
-      setShake(true);
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
       if (error instanceof ConvexError) {
         setErrors(error.data);
       } else {
@@ -67,7 +68,7 @@ const page = () => {
       className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4"
     >
       <div
-        className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-8  ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
+        className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
       >
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -147,6 +148,7 @@ const page = () => {
               <p className="text-sm font-medium">{errors}</p>
             </div>
           )}
+
           <Button
             type="submit"
             className={`w-full font-semibold ${errors && "border border-destructive"}`}

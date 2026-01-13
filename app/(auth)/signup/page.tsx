@@ -5,10 +5,14 @@ import { api } from "@/convex/_generated/api";
 import { useForm } from "@tanstack/react-form";
 import { useConvex } from "convex/react";
 import { ConvexError } from "convex/values";
+import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import z from "zod";
 
 const page = () => {
+  const [isShaking, setIsShaking] = useState(false);
+  const [errors, setErrors] = useState("");
   const convex = useConvex();
 
   const handleSubmit = async (
@@ -16,6 +20,10 @@ const page = () => {
     shouldHash: boolean,
     password: string,
   ) => {
+    if (!username.trim() || !password.trim()) {
+      setErrors("There are some fields empty");
+      return;
+    }
     try {
       const user = await convex.action(api.auth.signUp, {
         username,
@@ -24,17 +32,19 @@ const page = () => {
       });
 
       if (!user) {
-        alert("Invalid Credentials");
+        setErrors("Invalid Credentials");
         return;
       }
       console.log(user);
     } catch (error) {
       console.error("Login failed:", error);
 
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
       if (error instanceof ConvexError) {
-        alert(error.data);
+        setErrors(error.data);
       } else {
-        alert("Something went wrong. Please try again.");
+        setErrors("Something went wrong. Please try again.");
       }
     }
   };
@@ -59,7 +69,9 @@ const page = () => {
       }}
       className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4"
     >
-      <div className="w-full max-w-md space-y-8 bg-card border border-border shadow-lg p-8">
+      <div
+        className={`w-full max-w-md space-y-8 bg-card border border-border shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
+      >
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Create an account
@@ -91,7 +103,10 @@ const page = () => {
                   id={field.name}
                   onBlur={field.handleBlur}
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    setErrors("");
+                  }}
                   className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 {field.state.meta.errors.length > 0 && (
@@ -153,7 +168,10 @@ const page = () => {
                     id={field.name}
                     onBlur={field.handleBlur}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      setErrors("");
+                    }}
                     className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -192,7 +210,10 @@ const page = () => {
                     id={field.name}
                     onBlur={field.handleBlur}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      setErrors("");
+                    }}
                     className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -206,6 +227,13 @@ const page = () => {
               )}
             />
           </div>
+
+          {errors && (
+            <div className="animate-in slide-in-from-left-2 fade-in duration-300 flex items-center gap-3 rounded-lg bg-destructive/15 p-4 text-destructive">
+              <TriangleAlert className="h-5 w-5 shrink-0" />
+              <p className="text-sm font-medium">{errors}</p>
+            </div>
+          )}
 
           <Button type="submit" className="w-full font-semibold" size="lg">
             Warm up your hands now

@@ -14,7 +14,7 @@ export const signUp = action({
     const taken = await ctx.runQuery(internal.users.getUserByUsername, {
       username: args.username,
     });
-    if (taken) throw new Error("Username already taken");
+    if (taken) throw new ConvexError("Username already taken");
 
     let finalPassword = args.password;
     if (args.shouldHash) {
