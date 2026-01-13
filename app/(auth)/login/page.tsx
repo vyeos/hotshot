@@ -31,8 +31,6 @@ const page = () => {
       }
       console.log(user);
     } catch (error) {
-      console.error("Login failed:", error);
-
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       if (error instanceof ConvexError) {
