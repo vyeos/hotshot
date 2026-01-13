@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
 import { TriangleAlert } from "lucide-react";
+import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
@@ -58,16 +59,18 @@ const page = () => {
           <Button
             variant="outline"
             onClick={() => handleProviderLogin("github")}
-            className="w-full"
+            className="flex items-center justify-center gap-2 w-full"
           >
-            GitHub
+            <AnimeGithubIcon className="w-5 h-5" />
+            <span>GitHub</span>
           </Button>
           <Button
             variant="outline"
             onClick={() => handleProviderLogin("google")}
-            className="w-full"
+            className="flex items-center justify-center gap-2 w-full"
           >
-            Google
+            <AnimeGoogleIcon className="w-5 h-5" />
+            <span>Google</span>
           </Button>
         </div>
 
