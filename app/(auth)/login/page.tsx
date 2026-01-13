@@ -1,70 +1,47 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import z from "zod";
-import { useConvex } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { ConvexError } from "convex/values";
-import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import z from "zod";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [errors, setErrors] = useState("");
-  const convex = useConvex();
+  const { signIn } = useAuthActions();
 
-  const handleSubmit = async (username: string, password: string) => {
-    if (!username.trim() || !password.trim()) {
-      setErrors("Write some shit");
-      return;
-    }
+  const handlePasswordLogin = async (formData: any) => {
     try {
-      const user = await convex.action(api.auth.login, {
-        username,
-        password,
+      await signIn("password", {
+        email: formData.email,
+        password: formData.password,
+        flow: "signIn",
       });
-
-      if (!user) {
-        setErrors("Invalid Credentials");
-        return;
-      }
-      console.log(user);
     } catch (error) {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
-      if (error instanceof ConvexError) {
-        setErrors(error.data);
-      } else {
-        setErrors("Something went wrong. Please try again.");
-      }
+      setErrors("Invalid email or password");
     }
+  };
+
+  const handleProviderLogin = (provider: "github" | "google") => {
+    void signIn(provider);
   };
 
   const form = useForm({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
-    validators: {
-      onChange: z.object({
-        username: z.string(),
-        password: z.string(),
-      }),
-    },
     onSubmit: ({ value }) => {
-      handleSubmit(value.username, value.password);
+      handlePasswordLogin(value);
     },
   });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-      className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4"
-    >
+    <div className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4">
       <div
         className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
       >
@@ -77,20 +54,57 @@ const page = () => {
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            variant="outline"
+            onClick={() => handleProviderLogin("github")}
+            className="w-full"
+          >
+            GitHub
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleProviderLogin("google")}
+            className="w-full"
+          >
+            Google
+          </Button>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="space-y-6"
+        >
           <form.Field
-            name="username"
+            name="email"
+            validators={{
+              onChange: z.string().email(),
+            }}
             children={(field) => (
               <div className="space-y-2">
                 <label
                   htmlFor={field.name}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Username
+                  Email
                 </label>
                 <input
-                  type="text"
-                  placeholder="getting there"
+                  type="email"
+                  placeholder="name@example.com"
                   id={field.name}
                   onBlur={field.handleBlur}
                   value={field.state.value}
@@ -107,6 +121,9 @@ const page = () => {
           <div className="space-y-2">
             <form.Field
               name="password"
+              validators={{
+                onChange: z.string(),
+              }}
               children={(field) => (
                 <>
                   <div className="flex items-center justify-between">
@@ -164,9 +181,9 @@ const page = () => {
               Signup
             </Link>
           </div>
-        </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 

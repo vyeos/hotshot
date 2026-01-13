@@ -6,13 +6,19 @@ const schema = defineSchema({
   ...authTables,
 
   users: defineTable({
-    username: v.string(),
-    password: v.string(),
-    shouldHash: v.boolean(),
-    daily_allowance: v.number(),
-    energy: v.number(),
-    isVirgin: v.boolean(),
-  }).index("by_username", ["username"]),
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+
+    username: v.optional(v.string()),
+    daily_allowance: v.optional(v.number()),
+    energy: v.optional(v.number()),
+    isVirgin: v.optional(v.boolean()),
+  })
+    .index("by_username", ["username"])
+    .index("by_email", ["email"]),
 
   daily_drops: defineTable({
     title: v.string(),
