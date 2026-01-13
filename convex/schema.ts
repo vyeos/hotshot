@@ -1,7 +1,10 @@
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export default defineSchema({
+const schema = defineSchema({
+  ...authTables,
+
   users: defineTable({
     username: v.string(),
     password: v.string(),
@@ -34,3 +37,5 @@ export default defineSchema({
     .index("by_image", ["image_id"])
     .index("by_user", ["user_id"]),
 });
+
+export default schema;
