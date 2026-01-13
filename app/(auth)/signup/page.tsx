@@ -1,73 +1,59 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { api } from "@/convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import { useConvex } from "convex/react";
-import { ConvexError } from "convex/values";
 import { TriangleAlert } from "lucide-react";
+import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
+import { useConvex } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [errors, setErrors] = useState("");
+  const { signIn } = useAuthActions();
   const convex = useConvex();
+  const router = useRouter();
 
-  const handleSubmit = async (
-    username: string,
-    shouldHash: boolean,
-    password: string,
-  ) => {
-    if (!username.trim() || !password.trim()) {
-      setErrors("There are some fields empty");
-      return;
-    }
+  const handlePasswordSignup = async (formData: any) => {
     try {
-      const user = await convex.action(api.auth.signUp, {
-        username,
-        shouldHash,
-        password,
+      await signIn("password", {
+        email: formData.email,
+        password: formData.password,
+        username: formData.username,
+        flow: "signUp",
       });
-      if (!user) {
-        setErrors("Invalid Credentials");
-        return;
-      }
-      console.log(user);
+      router.push("/");
     } catch (error) {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
-      if (error instanceof ConvexError) {
-        setErrors(error.data);
-      } else {
-        setErrors("Something went wrong. Please try again.");
-      }
+      setErrors("Error creating account");
     }
+  };
+
+  const handleProviderSignup = (provider: "github" | "google") => {
+    void signIn(provider);
   };
 
   const form = useForm({
     defaultValues: {
       username: "",
-      shouldHash: true,
+      email: "",
       password: "",
       confirm: "",
     },
     onSubmit: async ({ value }) => {
-      await handleSubmit(value.username, value.shouldHash, value.password);
+      await handlePasswordSignup(value);
     },
   });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-      className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4"
-    >
+    <div className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4">
       <div
-        className={`w-full max-w-md space-y-8 bg-card border border-border shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
+        className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
       >
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -78,13 +64,57 @@ const page = () => {
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            variant="outline"
+            onClick={() => handleProviderSignup("github")}
+            className="flex items-center justify-center gap-2 w-full"
+          >
+            <AnimeGithubIcon className="w-5 h-5" />
+            <span>GitHub</span>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleProviderSignup("google")}
+            className="flex items-center justify-center gap-2 w-full"
+          >
+            <AnimeGoogleIcon className="w-5 h-5" />
+            <span>Google</span>
+          </Button>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="space-y-6"
+        >
           <form.Field
             name="username"
             validators={{
               onChange: z
                 .string()
-                .min(6, "Username must be at least 6 characters"),
+                .min(3, "Username must be at least 3 characters")
+                .max(20, "Username must be at most 20 characters")
+                .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed"),
+              onChangeAsyncDebounceMs: 500,
+              onChangeAsync: async ({ value }) => {
+                if (!value) return undefined;
+                const isTaken = await convex.query(api.users.isUsernameTaken, { username: value });
+                return isTaken ? "Username is already taken" : undefined;
+              },
             }}
             children={(field) => (
               <div className="space-y-2">
@@ -96,7 +126,7 @@ const page = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="getting there"
+                  placeholder="cool_user_123"
                   id={field.name}
                   onBlur={field.handleBlur}
                   value={field.state.value}
@@ -104,7 +134,7 @@ const page = () => {
                     field.handleChange(e.target.value);
                     setErrors("");
                   }}
-                  className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
                 {field.state.meta.errors.length > 0 && (
                   <p className="text-destructive text-xs font-medium pl-1">
@@ -118,24 +148,37 @@ const page = () => {
           />
 
           <form.Field
-            name="shouldHash"
+            name="email"
+            validators={{
+              onChange: z.string().email("Invalid email address"),
+            }}
             children={(field) => (
-              <div
-                className={`flex items-center justify-between border p-4 ${field.state.value && "bg-primary/20"}`}
-              >
-                <div className="space-y-0.5">
-                  <label htmlFor={field.name} className="text-sm font-medium">
-                    Password Hashing
-                  </label>
-                  <p className="text-xs text-muted-foreground">
-                    I won't be able to see your password if this is on
-                  </p>
-                </div>
-                <Switch
-                  checked={field.state.value}
-                  onCheckedChange={(checked) => field.handleChange(checked)}
+              <div className="space-y-2">
+                <label
+                  htmlFor={field.name}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  placeholder="name@example.com"
                   id={field.name}
+                  onBlur={field.handleBlur}
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    setErrors("");
+                  }}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-destructive text-xs font-medium pl-1">
+                    {field.state.meta.errors
+                      .map((err: any) => err.message || err)
+                      .join(", ")}
+                  </p>
+                )}
               </div>
             )}
           />
@@ -169,15 +212,15 @@ const page = () => {
                       field.handleChange(e.target.value);
                       setErrors("");
                     }}
-                    className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                   {field.state.meta.errors.length > 0 && (
                     <ul className="text-destructive text-xs font-medium list-disc pl-4">
                       {field.state.meta.errors.map((err: any, i: number) => (
-                        <li key={i}>{err.message || err}</li>
+                        <li key={i}>{typeof err === 'string' ? err : err.message}</li>
                       ))}
                     </ul>
-                  )}{" "}
+                  )}
                 </div>
               )}
             />
@@ -211,7 +254,7 @@ const page = () => {
                       field.handleChange(e.target.value);
                       setErrors("");
                     }}
-                    className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs font-medium">
@@ -245,9 +288,9 @@ const page = () => {
               Login
             </Link>
           </div>
-        </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 

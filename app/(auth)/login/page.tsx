@@ -1,70 +1,66 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
+import { TriangleAlert } from "lucide-react";
+import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
+import Link from "next/link";
+import { useState } from "react";
 import z from "zod";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { ConvexError } from "convex/values";
-import { useState } from "react";
-import { TriangleAlert } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [errors, setErrors] = useState("");
+  const { signIn } = useAuthActions();
   const convex = useConvex();
+  const router = useRouter();
 
-  const handleSubmit = async (username: string, password: string) => {
-    if (!username.trim() || !password.trim()) {
-      setErrors("Write some shit");
-      return;
-    }
+  const handlePasswordLogin = async (formData: any) => {
     try {
-      const user = await convex.action(api.auth.login, {
-        username,
-        password,
-      });
+      let email = formData.email;
 
-      if (!user) {
-        setErrors("Invalid Credentials");
-        return;
+      const isEmail = z.string().email().safeParse(email).success;
+      if (!isEmail) {
+        const resolvedEmail = await convex.query(api.users.getUserEmailByUsername, { username: email });
+        if (resolvedEmail) {
+          email = resolvedEmail;
+        } else {
+          throw new Error("Invalid username");
+        }
       }
-      console.log(user);
+
+      await signIn("password", {
+        email: email,
+        password: formData.password,
+        flow: "signIn",
+      });
+      router.push("/");
     } catch (error) {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
-      if (error instanceof ConvexError) {
-        setErrors(error.data);
-      } else {
-        setErrors("Something went wrong. Please try again.");
-      }
+      setErrors("Invalid email/username or password");
     }
+  };
+
+  const handleProviderLogin = (provider: "github" | "google") => {
+    void signIn(provider);
   };
 
   const form = useForm({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
-    validators: {
-      onChange: z.object({
-        username: z.string(),
-        password: z.string(),
-      }),
-    },
     onSubmit: ({ value }) => {
-      handleSubmit(value.username, value.password);
+      handlePasswordLogin(value);
     },
   });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-      className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4"
-    >
+    <div className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4">
       <div
         className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
       >
@@ -77,20 +73,59 @@ const page = () => {
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            variant="outline"
+            onClick={() => handleProviderLogin("github")}
+            className="flex items-center justify-center gap-2 w-full"
+          >
+            <AnimeGithubIcon className="w-5 h-5" />
+            <span>GitHub</span>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleProviderLogin("google")}
+            className="flex items-center justify-center gap-2 w-full"
+          >
+            <AnimeGoogleIcon className="w-5 h-5" />
+            <span>Google</span>
+          </Button>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="space-y-6"
+        >
           <form.Field
-            name="username"
+            name="email"
+            validators={{
+              onChange: z.string().min(1, "Email or Username is required"),
+            }}
             children={(field) => (
               <div className="space-y-2">
                 <label
                   htmlFor={field.name}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Username
+                  Email or Username
                 </label>
                 <input
                   type="text"
-                  placeholder="getting there"
+                  placeholder="username or email"
                   id={field.name}
                   onBlur={field.handleBlur}
                   value={field.state.value}
@@ -107,6 +142,9 @@ const page = () => {
           <div className="space-y-2">
             <form.Field
               name="password"
+              validators={{
+                onChange: z.string(),
+              }}
               children={(field) => (
                 <>
                   <div className="flex items-center justify-between">
@@ -164,9 +202,9 @@ const page = () => {
               Signup
             </Link>
           </div>
-        </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 
