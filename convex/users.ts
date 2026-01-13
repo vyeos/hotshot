@@ -1,40 +1,13 @@
-import { internalMutation, internalQuery } from "./_generated/server";
-import { v } from "convex/values";
+import { auth } from "./auth";
+import { query } from "./_generated/server";
 
-export const createUser = internalMutation({
-  args: {
-    username: v.string(),
-    password: v.string(),
-    shouldHash: v.boolean(),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .unique();
-
-    if (existing) {
-      throw new Error("Username already taken");
-    }
-
-    const newUserId = await ctx.db.insert("users", {
-      username: args.username,
-      password: args.password,
-      shouldHash: args.shouldHash,
-      daily_allowance: 20,
-      energy: 20,
-      isVirgin: false,
-    });
-    return await ctx.db.get(newUserId);
-  },
-});
-
-export const getUserByUsername = internalQuery({
-  args: { username: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("users")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .unique();
-  },
+export const currentUser = query({
+args: { },
+handler: async (ctx) => {
+  const userId = await auth.getUserId(ctx);
+  if (!userId) {
+    return null;
+  }
+  return await ctx.db.get(userId);
+},
 });
