@@ -38,6 +38,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         return {
           email: params.email as string,
           name: params.name as string,
+          username: params.username as string,
           // Custom fields
           daily_allowance: 20,
           energy: 20,

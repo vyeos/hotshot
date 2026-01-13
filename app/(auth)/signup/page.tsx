@@ -7,19 +7,26 @@ import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
+import { useConvex } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [errors, setErrors] = useState("");
   const { signIn } = useAuthActions();
+  const convex = useConvex();
+  const router = useRouter();
 
   const handlePasswordSignup = async (formData: any) => {
     try {
       await signIn("password", {
         email: formData.email,
         password: formData.password,
+        username: formData.username,
         flow: "signUp",
       });
+      router.push("/");
     } catch (error) {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
@@ -33,6 +40,7 @@ const page = () => {
 
   const form = useForm({
     defaultValues: {
+      username: "",
       email: "",
       password: "",
       confirm: "",
@@ -93,6 +101,52 @@ const page = () => {
           }}
           className="space-y-6"
         >
+          <form.Field
+            name="username"
+            validators={{
+              onChange: z
+                .string()
+                .min(3, "Username must be at least 3 characters")
+                .max(20, "Username must be at most 20 characters")
+                .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed"),
+              onChangeAsyncDebounceMs: 500,
+              onChangeAsync: async ({ value }) => {
+                if (!value) return undefined;
+                const isTaken = await convex.query(api.users.isUsernameTaken, { username: value });
+                return isTaken ? "Username is already taken" : undefined;
+              },
+            }}
+            children={(field) => (
+              <div className="space-y-2">
+                <label
+                  htmlFor={field.name}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Username
+                </label>
+                <input
+                  type="text"
+                  placeholder="cool_user_123"
+                  id={field.name}
+                  onBlur={field.handleBlur}
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    setErrors("");
+                  }}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-destructive text-xs font-medium pl-1">
+                    {field.state.meta.errors
+                      .map((err: any) => err.message || err)
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+
           <form.Field
             name="email"
             validators={{

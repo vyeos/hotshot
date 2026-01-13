@@ -7,23 +7,41 @@ import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
+import { useConvex } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [errors, setErrors] = useState("");
   const { signIn } = useAuthActions();
+  const convex = useConvex();
+  const router = useRouter();
 
   const handlePasswordLogin = async (formData: any) => {
     try {
+      let email = formData.email;
+
+      const isEmail = z.string().email().safeParse(email).success;
+      if (!isEmail) {
+        const resolvedEmail = await convex.query(api.users.getUserEmailByUsername, { username: email });
+        if (resolvedEmail) {
+          email = resolvedEmail;
+        } else {
+          throw new Error("Invalid username");
+        }
+      }
+
       await signIn("password", {
-        email: formData.email,
+        email: email,
         password: formData.password,
         flow: "signIn",
       });
+      router.push("/");
     } catch (error) {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
-      setErrors("Invalid email or password");
+      setErrors("Invalid email/username or password");
     }
   };
 
@@ -95,7 +113,7 @@ const page = () => {
           <form.Field
             name="email"
             validators={{
-              onChange: z.string().email(),
+              onChange: z.string().min(1, "Email or Username is required"),
             }}
             children={(field) => (
               <div className="space-y-2">
@@ -103,11 +121,11 @@ const page = () => {
                   htmlFor={field.name}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Email
+                  Email or Username
                 </label>
                 <input
-                  type="email"
-                  placeholder="name@example.com"
+                  type="text"
+                  placeholder="username or email"
                   id={field.name}
                   onBlur={field.handleBlur}
                   value={field.state.value}
