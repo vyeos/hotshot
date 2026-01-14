@@ -10,6 +10,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         return {
           id: profile.id.toString(),
           name: profile.name,
+          username: generateTemporaryUsername(),
           email: profile.email,
           image: profile.avatar_url,
           // custom fields
@@ -24,6 +25,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         return {
           id: profile.sub,
           name: profile.name,
+          username: generateTemporaryUsername(),
           email: profile.email,
           image: profile.picture,
           // custom fields
@@ -48,3 +50,8 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     }),
   ],
 });
+
+function generateTemporaryUsername() {
+  const randomSuffix = Math.random().toString(36).substring(2, 10);
+  return `user_${randomSuffix}`;
+}

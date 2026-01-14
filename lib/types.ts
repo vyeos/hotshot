@@ -7,7 +7,7 @@ export type User = {
     image?: string;
     email: string;
     emailVerificationTime?: number;
-    username?: string;
+    username: string;
     daily_allowance: number;
     energy: number;
     isVirgin: boolean;
