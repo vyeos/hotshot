@@ -1,14 +1,14 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useCurrentUser } from "@/hooks/use-current-user";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { useCurrentUser } from "@/components/UserProvider";
 
 function SetUsername() {
   const setUsernameMutation = useMutation(api.users.setUsername);
@@ -66,10 +66,8 @@ function SetUsername() {
 }
 
 function Dashboard() {
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const { signOut } = useAuthActions();
-
-  if (user === undefined) return null; // Loading
 
   if (user && !user.username) {
     return <SetUsername />;
@@ -88,7 +86,6 @@ function Dashboard() {
 export default function Page() {
   const router = useRouter();
 
-  // Simple redirect for unauthenticated users for now, or show Landing
   return (
     <>
       <Authenticated>
