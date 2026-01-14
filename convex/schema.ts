@@ -18,7 +18,7 @@ const schema = defineSchema({
     isVirgin: v.optional(v.boolean()),
   })
     .index("by_username", ["username"])
-    .index("by_email", ["email"]),
+    .index("email", ["email"]),
 
   daily_drops: defineTable({
     title: v.string(),
