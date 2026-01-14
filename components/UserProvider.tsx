@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { FullScreenLoader } from "@/components/AnimeLoader";
+import { FullScreenLoader } from "@/components/ui/AnimeLoader";
 import { useQuery } from "convex/react";
 import { createContext, useContext } from "react";
 import { User } from "@/lib/types";

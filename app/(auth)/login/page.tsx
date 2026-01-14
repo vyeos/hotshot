@@ -2,7 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import { AnimeGithubIcon, AnimeGoogleIcon, AnimeAlert } from "@/components/AnimeIcons";
+import {
+  AnimeGithubIcon,
+  AnimeGoogleIcon,
+  AnimeAlert,
+} from "@/components/ui/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
@@ -23,7 +27,10 @@ const page = () => {
 
       const isEmail = z.string().email().safeParse(email).success;
       if (!isEmail) {
-        const resolvedEmail = await convex.query(api.users.getUserEmailByUsername, { username: email });
+        const resolvedEmail = await convex.query(
+          api.users.getUserEmailByUsername,
+          { username: email },
+        );
         if (resolvedEmail) {
           email = resolvedEmail;
         } else {
