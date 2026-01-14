@@ -2,6 +2,8 @@
 
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
+import { cn } from "@/lib/utils";
+import { getDropTitleGradient } from "@/lib/gradients";
 
 const Drops = () => {
   const dailyDrop = useQuery(api.daily_drops.getDailyDrop);
@@ -30,7 +32,12 @@ const Drops = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
-        <h2 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+        <h2
+          className={cn(
+            "text-3xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+            getDropTitleGradient(dailyDrop.images.length),
+          )}
+        >
           {dailyDrop.title}
         </h2>
         <div className="text-xs font-mono text-muted-foreground border border-white/10 px-2 py-1 rounded">
@@ -42,7 +49,7 @@ const Drops = () => {
         {dailyDrop.images.map((img, idx) => (
           <div
             key={img._id}
-            className="group relative aspect-[4/5] rounded-xl overflow-hidden border-2 border-white/5 bg-black/20 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:-translate-y-1"
+            className="group relative aspect-4/5 rounded-xl overflow-hidden border-2 border-white/5 bg-black/20 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:-translate-y-1"
           >
             <div className="absolute top-2 left-2 z-10 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white border border-white/10">
               #{idx + 1}
@@ -53,15 +60,6 @@ const Drops = () => {
               alt={`Drop ${idx + 1}`}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
-
-            <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-white">Tributes</span>
-                <span className="text-yellow-400 font-mono">
-                  {img.total_tributes}
-                </span>
-              </div>
-            </div>
           </div>
         ))}
       </div>
