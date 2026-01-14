@@ -12,7 +12,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           name: profile.name,
           email: profile.email,
           image: profile.avatar_url,
-          // Custom fields
+          // custom fields
           daily_allowance: 20,
           energy: 20,
           isVirgin: false,
@@ -26,7 +26,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          // Custom fields
+          // custom fields
           daily_allowance: 20,
           energy: 20,
           isVirgin: false,
@@ -39,7 +39,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           email: params.email as string,
           name: params.name as string,
           username: params.username as string,
-          // Custom fields
+          // custom fields
           daily_allowance: 20,
           energy: 20,
           isVirgin: false,

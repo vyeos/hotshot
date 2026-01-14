@@ -21,6 +21,7 @@ const page = () => {
   const handlePasswordSignup = async (formData: any) => {
     try {
       await signIn("password", {
+        name: formData.name,
         email: formData.email,
         password: formData.password,
         username: formData.username,
@@ -40,10 +41,10 @@ const page = () => {
 
   const form = useForm({
     defaultValues: {
+      name: "",
       username: "",
       email: "",
       password: "",
-      confirm: "",
     },
     onSubmit: async ({ value }) => {
       await handlePasswordSignup(value);
@@ -102,6 +103,42 @@ const page = () => {
           className="space-y-6"
         >
           <form.Field
+            name="name"
+            validators={{
+              onChange: z.string().min(2, "Name must be at least 2 characters"),
+            }}
+            children={(field) => (
+              <div className="space-y-2">
+                <label
+                  htmlFor={field.name}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Waifu Lover"
+                  id={field.name}
+                  onBlur={field.handleBlur}
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    setErrors("");
+                  }}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-destructive text-xs font-medium pl-1">
+                    {field.state.meta.errors
+                      .map((err: any) => err.message || err)
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+
+          <form.Field
             name="username"
             validators={{
               onChange: z
@@ -126,7 +163,7 @@ const page = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="cool_user_123"
+                  placeholder="anime_lover_69"
                   id={field.name}
                   onBlur={field.handleBlur}
                   value={field.state.value}
@@ -225,47 +262,6 @@ const page = () => {
               )}
             />
 
-            <form.Field
-              name="confirm"
-              validators={{
-                onChangeListenTo: ["password"],
-                onChange: ({ value, fieldApi }) => {
-                  if (value !== fieldApi.form.getFieldValue("password")) {
-                    return "Passwords do not match";
-                  }
-                  return undefined;
-                },
-              }}
-              children={(field) => (
-                <div className="space-y-2">
-                  <label
-                    htmlFor={field.name}
-                    className="text-sm font-medium leading-none"
-                  >
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="confirm your secret"
-                    id={field.name}
-                    onBlur={field.handleBlur}
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                      setErrors("");
-                    }}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  />
-                  {field.state.meta.errors.length > 0 && (
-                    <p className="text-destructive text-xs font-medium">
-                      {field.state.meta.errors
-                        .map((err: any) => err.message || err)
-                        .join(", ")}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
           </div>
 
           {errors && (
