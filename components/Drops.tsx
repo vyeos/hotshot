@@ -15,12 +15,16 @@ const Drops = () => {
   const [tributeAmount, setTributeAmount] = useState<string>("1");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Determine which images have been voted on
   const votedImageIds = new Set(dailyDrop?.userState?.votedImageIds ?? []);
 
-  const firstUnvotedIndex = dailyDrop?.images.findIndex(img => !votedImageIds.has(img._id)) ?? -1;
+  // Find the first unvoted image index
+  const firstUnvotedIndex =
+    dailyDrop?.images.findIndex((img) => !votedImageIds.has(img._id)) ?? -1;
   const isCompleted = firstUnvotedIndex === -1;
 
-  const currentVotingImage = !isCompleted && dailyDrop ? dailyDrop.images[firstUnvotedIndex] : null;
+  const currentVotingImage =
+    !isCompleted && dailyDrop ? dailyDrop.images[firstUnvotedIndex] : null;
 
   const handleTribute = async () => {
     if (!dailyDrop || !currentVotingImage || !dailyDrop.userState) return;
@@ -47,7 +51,6 @@ const Drops = () => {
       setIsSubmitting(false);
     }
   };
-
 
   if (dailyDrop === undefined) {
     return (
@@ -77,10 +80,12 @@ const Drops = () => {
     return (
       <div className="max-w-md mx-auto space-y-6 pt-10">
         <div className="text-center space-y-2">
-          <h2 className={cn(
-            "text-3xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
-            getDropTitleGradient(dailyDrop.images.length),
-          )}>
+          <h2
+            className={cn(
+              "text-3xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+              getDropTitleGradient(dailyDrop.images.length),
+            )}
+          >
             {dailyDrop.title}
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -99,7 +104,9 @@ const Drops = () => {
         <div className="space-y-4 p-4 bg-secondary/10 rounded-xl border border-white/5">
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground">Your Energy</span>
-            <span className="font-mono font-bold text-yellow-400">{dailyDrop.userState?.energy ?? 0} ⚡</span>
+            <span className="font-mono font-bold text-yellow-400">
+              {dailyDrop.userState?.energy ?? 0} ⚡
+            </span>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -116,12 +123,12 @@ const Drops = () => {
               disabled={isSubmitting}
               className="w-full font-bold tracking-wide h-12"
             >
-              {isSubmitting ? "CUMMING..." : "GIVE TRIBUTE"}
+              {isSubmitting ? "GIVING..." : "GIVE TRIBUTE"}
             </Button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Gallery / Completed View
@@ -157,15 +164,17 @@ const Drops = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {dailyDrop.images.map((img, idx) => {
           const isVoted = votedImageIds.has(img._id);
-          // Optional: Visually distinguish voted vs not voted in grid? 
-          // Requirement just says "Show remaining images together as it is".
-          // So default view is fine.
           return (
             <div
               key={img._id}
               className={cn(
-                "group relative aspect-4/5 rounded-xl overflow-hidden border-2 border-white/5 bg-black/20 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1",
-                getDropImageGlow(dailyDrop.images.length),
+                "group relative aspect-4/5 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:-translate-y-1",
+                isVoted
+                  ? cn(
+                    getDropImageGlow(dailyDrop.images.length),
+                    "border-white/5 bg-black/20",
+                  )
+                  : "grayscale opacity-60 border-white/5 bg-black/50 hover:opacity-100",
               )}
             >
               <div className="absolute top-2 left-2 z-10 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white border border-white/10">
@@ -184,10 +193,15 @@ const Drops = () => {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
 
-              <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <div className="absolute bottom-0 left-0 w-full p-4 bg-linear-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-bold text-white">Tributes</span>
-                  <span className="text-yellow-400 font-mono">
+                  <span
+                    className={cn(
+                      "font-mono",
+                      isVoted ? "text-yellow-400" : "text-gray-400",
+                    )}
+                  >
                     {img.total_tributes}
                   </span>
                 </div>
@@ -197,8 +211,10 @@ const Drops = () => {
         })}
       </div>
 
-      <div className="flex justify-center py-8 text-center text-muted-foreground text-sm">
-        {isCompleted ? "New drop will come tomorrow." : "Get more energy to continue voting!"}
+      <div className="flex justify-center py-8 text-center text-xl font-bold text-white/80">
+        {isCompleted
+          ? "New drop will come tomorrow."
+          : "Get more energy to continue voting or wait for tomorrow for new drops!"}
       </div>
     </div>
   );
