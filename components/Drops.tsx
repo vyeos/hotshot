@@ -123,7 +123,7 @@ const Drops = () => {
               disabled={isSubmitting}
               className="w-full font-bold tracking-wide h-12"
             >
-              {isSubmitting ? "GIVING..." : "GIVE TRIBUTE"}
+              {isSubmitting ? "CUMMING..." : "GIVE TRIBUTE"}
             </Button>
           </div>
         </div>
@@ -161,19 +161,19 @@ const Drops = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
         {dailyDrop.images.map((img, idx) => {
           const isVoted = votedImageIds.has(img._id);
           return (
             <div
               key={img._id}
               className={cn(
-                "group relative aspect-4/5 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:-translate-y-1",
+                "group relative rounded-xl overflow-hidden border-2 transition-all duration-300 hover:-translate-y-1",
                 isVoted
                   ? cn(
-                    getDropImageGlow(dailyDrop.images.length),
-                    "border-white/5 bg-black/20",
-                  )
+                      getDropImageGlow(dailyDrop.images.length),
+                      "border-white/5 bg-black/20",
+                    )
                   : "grayscale opacity-60 border-white/5 bg-black/50 hover:opacity-100",
               )}
             >
@@ -190,7 +190,7 @@ const Drops = () => {
               <img
                 src={img.url ?? ""}
                 alt={`Drop ${idx + 1}`}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-auto transition-transform duration-500 group-hover:scale-110"
               />
 
               <div className="absolute bottom-0 left-0 w-full p-4 bg-linear-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
