@@ -22,6 +22,10 @@ const Navbar = () => {
   const { signOut } = useAuthActions();
   const pathname = usePathname();
 
+  if (pathname === "/login" || pathname === "/signup") {
+    return null;
+  }
+
   const navLinks: NavLinkProps[] = [
     {
       name: "DROPS",
