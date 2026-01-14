@@ -171,9 +171,9 @@ const Drops = () => {
                 "group relative rounded-xl overflow-hidden border-2 transition-all duration-300 hover:-translate-y-1",
                 isVoted
                   ? cn(
-                      getDropImageGlow(dailyDrop.images.length),
-                      "border-white/5 bg-black/20",
-                    )
+                    getDropImageGlow(dailyDrop.images.length),
+                    "border-white/5 bg-black/20",
+                  )
                   : "grayscale opacity-60 border-white/5 bg-black/50 hover:opacity-100",
               )}
             >
@@ -190,7 +190,7 @@ const Drops = () => {
               <img
                 src={img.url ?? ""}
                 alt={`Drop ${idx + 1}`}
-                className="w-full h-auto transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-[600px] object-contain transition-transform duration-500 group-hover:scale-110"
               />
 
               <div className="absolute bottom-0 left-0 w-full p-4 bg-linear-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
