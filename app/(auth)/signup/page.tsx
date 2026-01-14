@@ -2,7 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import { AnimeGithubIcon, AnimeGoogleIcon, AnimeAlert, AnimeEye, AnimeEyeOff } from "@/components/AnimeIcons";
+import {
+  AnimeGithubIcon,
+  AnimeGoogleIcon,
+  AnimeAlert,
+  AnimeEye,
+  AnimeEyeOff,
+} from "@/components/ui/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
@@ -145,11 +151,16 @@ const page = () => {
                 .string()
                 .min(3, "Username must be at least 3 characters")
                 .max(20, "Username must be at most 20 characters")
-                .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed"),
+                .regex(
+                  /^[a-zA-Z0-9_]+$/,
+                  "Only letters, numbers, and underscores allowed",
+                ),
               onChangeAsyncDebounceMs: 500,
               onChangeAsync: async ({ value }) => {
                 if (!value) return undefined;
-                const isTaken = await convex.query(api.users.isUsernameTaken, { username: value });
+                const isTaken = await convex.query(api.users.isUsernameTaken, {
+                  username: value,
+                });
                 return isTaken ? "Username is already taken" : undefined;
               },
             }}
@@ -267,14 +278,15 @@ const page = () => {
                   {field.state.meta.errors.length > 0 && (
                     <ul className="text-destructive text-xs font-medium list-disc pl-4">
                       {field.state.meta.errors.map((err: any, i: number) => (
-                        <li key={i}>{typeof err === 'string' ? err : err.message}</li>
+                        <li key={i}>
+                          {typeof err === "string" ? err : err.message}
+                        </li>
                       ))}
                     </ul>
                   )}
                 </div>
               )}
             />
-
           </div>
 
           {errors && (
