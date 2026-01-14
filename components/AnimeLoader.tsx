@@ -1,4 +1,3 @@
-import React from "react";
 import { AnimeEye } from "./AnimeIcons";
 
 export function AnimeLoader({ className = "", size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) {

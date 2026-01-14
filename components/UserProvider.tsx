@@ -20,7 +20,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const isLoading = user === undefined;
   const isAuthenticated = user !== null && !isLoading;
 
-  if (!isLoading) return <FullScreenLoader />;
+  if (isLoading) return <FullScreenLoader />;
 
   return (
     <UserContext.Provider
