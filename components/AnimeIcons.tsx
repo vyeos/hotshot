@@ -109,3 +109,68 @@ export const AnimeAlert = ({ className = "w-6 h-6", ...props }: React.SVGProps<S
     <path d="M12 7l2-2" strokeWidth="1" />
   </svg>
 );
+
+export const AnimeTodayIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+    <path d="M7 14h2" strokeWidth="1.5" />
+    <path d="M7 18h5" strokeWidth="1.5" />
+    <path d="M21 6l2-2" strokeWidth="1.5" />
+    <path d="M1 6l-2-2" strokeWidth="1.5" />
+  </svg>
+);
+
+export const AnimeArchiveIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    <path d="M14 6l2 2" strokeWidth="1.5" />
+    <path d="M14 10l2 2" strokeWidth="1.5" />
+    <path d="M2 5l-1-1" strokeWidth="1" />
+  </svg>
+);
+
+export const AnimeRankingIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" />
+    <path d="M12 2l3 3h4a2 2 0 0 1 2 2v3c0 3-2 6-6 8a13 13 0 0 1-6 0c-4-2-6-5-6-8V7a2 2 0 0 1 2-2h4l3-3z" />
+    <path d="M12 6v6" strokeWidth="1" className="opacity-50" />
+    <path d="M23 2l-2 2" strokeWidth="1.5" />
+    <path d="M1 2l2 2" strokeWidth="1.5" />
+  </svg>
+);

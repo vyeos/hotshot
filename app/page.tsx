@@ -9,6 +9,7 @@ import { Authenticated, Unauthenticated } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useCurrentUser } from "@/components/UserProvider";
+import Navbar from "@/components/Navbar";
 
 function SetUsername() {
   const setUsernameMutation = useMutation(api.users.setUsername);
@@ -67,19 +68,18 @@ function SetUsername() {
 
 function Dashboard() {
   const { user } = useCurrentUser();
-  const { signOut } = useAuthActions();
 
   if (user && !user.username) {
     return <SetUsername />;
   }
 
   return (
-    <div className="flex flex-col gap-2 min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">Welcome, {user?.username}</h1>
-      <Button variant="destructive" onClick={() => void signOut()}>
-        Sign out
-      </Button>
-    </div>
+    <>
+      <Navbar />
+      <div className="flex flex-col gap-2 min-h-screen items-center justify-center">
+        <h1 className="text-4xl font-bold">Welcome, {user?.username}</h1>
+      </div>
+    </>
   );
 }
 
