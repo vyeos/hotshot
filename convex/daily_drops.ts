@@ -126,15 +126,16 @@ export const getDailyDrop = query({
           .collect();
 
         const imagesIds = new Set(images.map(i => i._id));
+        const tributes: Record<string, number> = {};
         for (const t of userTributes) {
           if (imagesIds.has(t.image_id)) {
-            votedImageIds.add(t.image_id);
+            tributes[t.image_id] = (tributes[t.image_id] || 0) + t.tributes;
           }
         }
 
         userState = {
           energy: user.energy,
-          votedImageIds: Array.from(votedImageIds),
+          tributes,
         };
       }
     }

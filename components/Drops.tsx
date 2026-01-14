@@ -16,7 +16,8 @@ const Drops = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Determine which images have been voted on
-  const votedImageIds = new Set(dailyDrop?.userState?.votedImageIds ?? []);
+  const tributes = dailyDrop?.userState?.tributes ?? {};
+  const votedImageIds = new Set(Object.keys(tributes));
 
   // Find the first unvoted image index
   const firstUnvotedIndex =
@@ -195,14 +196,14 @@ const Drops = () => {
 
               <div className="absolute bottom-0 left-0 w-full p-4 bg-linear-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-white">Tributes</span>
+                  <span className="text-sm font-bold text-white">My Tributes</span>
                   <span
                     className={cn(
                       "font-mono",
                       isVoted ? "text-yellow-400" : "text-gray-400",
                     )}
                   >
-                    {img.total_tributes}
+                    {dailyDrop.userState?.tributes?.[img._id] ?? 0}
                   </span>
                 </div>
               </div>
