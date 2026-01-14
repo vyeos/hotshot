@@ -79,7 +79,7 @@ const Drops = () => {
 
   if (showVoting && currentVotingImage) {
     return (
-      <div className="max-w-md mx-auto space-y-6 pt-10">
+      <div className="max-w-md mx-auto space-y-6 pt-10 px-4">
         <div className="text-center space-y-2">
           <h2
             className={cn(
@@ -134,7 +134,7 @@ const Drops = () => {
 
   // Gallery / Completed View
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 max-w-7xl mx-auto">
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <div>
           <h2
@@ -157,8 +157,8 @@ const Drops = () => {
           )}
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground border border-white/10 px-2 py-1 rounded">
-          {dailyDrop.date}
+        <div className="text-xl font-mono font-bold text-white border border-white/20 px-3 py-1 rounded bg-white/5">
+          {dailyDrop.date.split("-").reverse().join("-")}
         </div>
       </div>
 
