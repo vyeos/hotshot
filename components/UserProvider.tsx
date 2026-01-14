@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
+import { FullScreenLoader } from "@/components/AnimeLoader";
 import { useQuery } from "convex/react";
 import { createContext, useContext } from "react";
 import { User } from "@/lib/types";
@@ -19,12 +20,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const isLoading = user === undefined;
   const isAuthenticated = user !== null && !isLoading;
 
-  if (isLoading)
-    return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <p className="animate-pulse">Loading Application...</p>
-      </div>
-    );
+  if (!isLoading) return <FullScreenLoader />;
 
   return (
     <UserContext.Provider
