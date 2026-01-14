@@ -2,8 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import { TriangleAlert } from "lucide-react";
-import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
+import { AnimeGithubIcon, AnimeGoogleIcon, AnimeAlert, AnimeEye, AnimeEyeOff } from "@/components/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
@@ -13,6 +12,7 @@ import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState("");
   const { signIn } = useAuthActions();
   const convex = useConvex();
@@ -239,18 +239,31 @@ const page = () => {
                   >
                     Password
                   </label>
-                  <input
-                    type="password"
-                    placeholder="your secret"
-                    id={field.name}
-                    onBlur={field.handleBlur}
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                      setErrors("");
-                    }}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="your secret"
+                      id={field.name}
+                      onBlur={field.handleBlur}
+                      value={field.state.value}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        setErrors("");
+                      }}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <AnimeEyeOff className="h-4 w-4" />
+                      ) : (
+                        <AnimeEye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                   {field.state.meta.errors.length > 0 && (
                     <ul className="text-destructive text-xs font-medium list-disc pl-4">
                       {field.state.meta.errors.map((err: any, i: number) => (
@@ -266,7 +279,7 @@ const page = () => {
 
           {errors && (
             <div className="animate-in slide-in-from-left-2 fade-in duration-300 flex items-center gap-3 rounded-lg bg-destructive/15 p-4 text-destructive">
-              <TriangleAlert className="h-5 w-5 shrink-0" />
+              <AnimeAlert className="h-5 w-5 shrink-0" />
               <p className="text-sm font-medium">{errors}</p>
             </div>
           )}

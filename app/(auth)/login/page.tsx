@@ -2,8 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useForm } from "@tanstack/react-form";
-import { TriangleAlert } from "lucide-react";
-import { AnimeGithubIcon, AnimeGoogleIcon } from "@/components/AnimeIcons";
+import { AnimeGithubIcon, AnimeGoogleIcon, AnimeAlert } from "@/components/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
 import z from "zod";
@@ -180,7 +179,7 @@ const page = () => {
 
           {errors && (
             <div className="animate-in slide-in-from-left-2 fade-in duration-300 flex items-center gap-3 rounded-lg bg-destructive/15 p-4 text-destructive">
-              <TriangleAlert className="h-5 w-5 shrink-0" />
+              <AnimeAlert className="h-5 w-5 shrink-0" />
               <p className="text-sm font-medium">{errors}</p>
             </div>
           )}
