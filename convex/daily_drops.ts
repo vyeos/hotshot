@@ -39,10 +39,59 @@ export const create = mutation({
   },
 });
 
+import { auth } from "./auth";
+import { Id } from "./_generated/dataModel";
+
+export const giveTribute = mutation({
+  args: {
+    imageId: v.id("images"),
+    amount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("User not found");
+
+    if (user.energy < args.amount) {
+      throw new Error("Not enough energy");
+    }
+
+    if (args.amount <= 0) {
+      throw new Error("Amount must be positive");
+    }
+
+    // Update image tributes
+    const image = await ctx.db.get(args.imageId);
+    if (!image) throw new Error("Image not found");
+
+    // Deduct energy
+    await ctx.db.patch(userId, {
+      energy: user.energy - args.amount,
+    });
+
+    await ctx.db.patch(args.imageId, {
+      total_tributes: image.total_tributes + args.amount,
+    });
+
+    // Record tribute
+    await ctx.db.insert("tributes_given", {
+      user_id: userId,
+      image_id: args.imageId,
+      tributes: args.amount,
+      timestamp: Date.now(),
+    });
+
+    return true;
+  },
+});
+
 export const getDailyDrop = query({
   args: {},
   handler: async (ctx) => {
     const today = new Date().toISOString().split("T")[0];
+    const userId = await auth.getUserId(ctx);
 
     const drop = await ctx.db
       .query("daily_drops")
@@ -65,9 +114,35 @@ export const getDailyDrop = query({
       }))
     );
 
+    let userState = null;
+    if (userId) {
+      const user = await ctx.db.get(userId);
+      if (user) {
+        const votedImageIds = new Set<Id<"images">>();
+
+        const userTributes = await ctx.db
+          .query("tributes_given")
+          .withIndex("by_user", q => q.eq("user_id", userId))
+          .collect();
+
+        const imagesIds = new Set(images.map(i => i._id));
+        for (const t of userTributes) {
+          if (imagesIds.has(t.image_id)) {
+            votedImageIds.add(t.image_id);
+          }
+        }
+
+        userState = {
+          energy: user.energy,
+          votedImageIds: Array.from(votedImageIds),
+        };
+      }
+    }
+
     return {
       ...drop,
       images: imagesWithUrls.sort((a, b) => a.sequence_idx - b.sequence_idx),
+      userState,
     };
   },
 });
