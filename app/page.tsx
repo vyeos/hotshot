@@ -75,7 +75,7 @@ function Dashboard() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-        <h1 className="text-4xl font-bold">Welcome, {user?.username}</h1>
+      <h1 className="text-4xl font-bold">Welcome, {user?.username}</h1>
     </div>
   );
 }
@@ -94,7 +94,9 @@ export default function Page() {
           <h1 className="text-4xl font-bold mb-8">Hotshot</h1>
           <div className="flex gap-4">
             <Button onClick={() => router.push("/login")}>Login</Button>
-            <Button onClick={() => router.push("/signup")} variant="outline">Signup</Button>
+            <Button onClick={() => router.push("/signup")} variant="outline">
+              Signup
+            </Button>
           </div>
         </div>
       </Unauthenticated>
