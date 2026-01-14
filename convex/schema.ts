@@ -28,7 +28,7 @@ const schema = defineSchema({
   images: defineTable({
     drop_id: v.id("daily_drops"),
     sequence_idx: v.number(),
-    url: v.string(),
+    storageId: v.string(),
     total_tributes: v.number(),
   })
     .index("by_drop", ["drop_id"])
