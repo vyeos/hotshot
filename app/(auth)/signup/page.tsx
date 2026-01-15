@@ -15,16 +15,20 @@ import z from "zod";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const { signIn } = useAuthActions();
   const convex = useConvex();
   const router = useRouter();
 
   const handlePasswordSignup = async (formData: any) => {
+    setIsLoading(true);
+    setErrors("");
     try {
       await signIn("password", {
         name: formData.name,
@@ -35,6 +39,7 @@ const page = () => {
       });
       router.push("/");
     } catch (error) {
+      setIsLoading(false);
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       setErrors("Error creating account");
@@ -296,8 +301,20 @@ const page = () => {
             </div>
           )}
 
-          <Button type="submit" className="w-full font-semibold" size="lg">
-            Warm up your hands now
+          <Button
+            type="submit"
+            className="w-full font-semibold"
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Almost there...
+              </>
+            ) : (
+              "Warm up your hands now"
+            )}
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
