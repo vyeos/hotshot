@@ -12,8 +12,14 @@ import {
   AnimeRankingIcon,
   AnimeUserIcon,
 } from "./ui/AnimeIcons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { useCurrentUser } from "./UserProvider";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 interface NavLinkProps {
   name: string;
@@ -92,62 +98,60 @@ const Navbar = () => {
 
       <div className="flex items-center gap-4 relative">
         {user ? (
-          <>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 group relative overflow-hidden",
-                isProfileOpen
-                  ? "bg-primary/10 text-primary"
-                  : "hover:bg-secondary/20 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {isProfileOpen && (
-                <div className="absolute inset-0 bg-primary/5 opacity-50 animate-pulse" />
-              )}
+          <DropdownMenu open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 group relative overflow-hidden outline-none ring-0",
+                  isProfileOpen
+                    ? "bg-primary/10 text-primary"
+                    : "hover:bg-secondary/20 text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {isProfileOpen && (
+                  <div className="absolute inset-0 bg-primary/5 opacity-50 animate-pulse" />
+                )}
 
-              <span className={cn(
-                "transition-transform duration-300",
-                isProfileOpen ? "scale-110" : "group-hover:scale-110"
-              )}>
-                <AnimeUserIcon className="w-6 h-6" />
-              </span>
+                <span className={cn(
+                  "transition-transform duration-300",
+                  isProfileOpen ? "scale-110" : "group-hover:scale-110"
+                )}>
+                  <AnimeUserIcon className="w-6 h-6" />
+                </span>
 
-              <span className="hidden md:inline-block font-semibold text-sm tracking-wide z-10 transition-transform duration-300">
-                {user.username}
-              </span>
+                <span className="hidden md:inline-block font-semibold text-sm tracking-wide z-10 transition-transform duration-300">
+                  {user.username}
+                </span>
 
-              {isProfileOpen && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_10px_rgba(255,100,0,0.5)]" />
-              )}
-            </button>
-
-            {isProfileOpen && (
-              <div className="absolute top-full right-0 mt-2 w-64 bg-card/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 p-4 space-y-4">
-                <div className="space-y-1">
-                  <p className="font-bold text-lg text-white">{user.username}</p>
-                  <p className="text-xs text-muted-foreground truncate" title={user.email}>
-                    {user.email}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-secondary/10 rounded-lg border border-white/5">
-                  <span className="text-sm text-muted-foreground">Energy</span>
-                  <span className="font-mono font-bold text-yellow-400">
-                    {user.energy ?? 0} ⚡
-                  </span>
-                </div>
-
-                <Button
-                  variant="destructive"
-                  onClick={() => void signOut()}
-                  className="w-full font-bold tracking-wider"
-                >
-                  SIGN OUT
-                </Button>
+                {isProfileOpen && (
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_10px_rgba(255,100,0,0.5)]" />
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 bg-card/95 backdrop-blur-xl border-white/10 rounded-xl shadow-2xl p-4 space-y-4">
+              <div className="space-y-1">
+                <p className="font-bold text-lg text-white">{user.username}</p>
+                <p className="text-xs text-muted-foreground truncate" title={user.email}>
+                  {user.email}
+                </p>
               </div>
-            )}
-          </>
+
+              <div className="flex items-center justify-between p-3 bg-secondary/10 rounded-lg border border-white/5">
+                <span className="text-sm text-muted-foreground">Energy</span>
+                <span className="font-mono font-bold text-yellow-400">
+                  {user.energy ?? 0} ⚡
+                </span>
+              </div>
+
+              <Button
+                variant="destructive"
+                onClick={() => void signOut()}
+                className="w-full font-bold tracking-wider"
+              >
+                SIGN OUT
+              </Button>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Link href="/login">
             <Button className="font-bold tracking-wider px-6">
@@ -156,7 +160,7 @@ const Navbar = () => {
           </Link>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 
