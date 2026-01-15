@@ -73,7 +73,7 @@ const Page = () => {
         <p className="text-4xl font-black tracking-widest uppercase text-primary mb-4">
           No Drops Yet
         </p>
-        <p className="text-xl font-medium text-white/80">
+        <p className="text-xl font-medium text-primary/80">
           Check back later, Senpai!
         </p>
       </div>
@@ -86,7 +86,7 @@ const Page = () => {
         <p className="text-4xl font-black tracking-widest uppercase text-destructive mb-4">
           No Drop Today
         </p>
-        <p className="text-xl font-medium text-white/80">
+        <p className="text-xl font-medium text-primary/80">
           A release will come tomorrow!
         </p>
       </div>
@@ -114,7 +114,7 @@ const Page = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
-          <div className="relative rounded-xl overflow-hidden border-2 border-white/5 bg-black/20 shadow-xl flex justify-center flex-1 w-full max-w-3xl">
+          <div className="relative rounded-xl overflow-hidden border-2 border-primary/5 bg-background/20 shadow-xl flex justify-center flex-1 w-full max-w-3xl">
             <img
               src={currentVotingImage.url ?? ""}
               alt={`Drop ${firstUnvotedIndex + 1}`}
@@ -122,8 +122,8 @@ const Page = () => {
             />
           </div>
 
-          <div className="space-y-4 p-6 bg-secondary/10 rounded-xl border border-white/5 w-full lg:w-96 shrink-0 lg:sticky lg:top-24 backdrop-blur-sm">
-            <div className="flex justify-between items-center text-sm border-b border-white/5 pb-4">
+          <div className="space-y-4 p-6 bg-secondary/10 rounded-xl border border-primary/5 w-full lg:w-96 shrink-0 lg:sticky lg:top-24 backdrop-blur-sm">
+            <div className="flex justify-between items-center text-sm border-b border-primary/5 pb-4">
               <span className="text-muted-foreground font-medium">Your Energy</span>
               <span className="font-mono font-bold text-accent-foreground flex items-center gap-2 text-lg">
                 {dailyDrop.userState?.energy ?? 0}{" "}
@@ -143,7 +143,7 @@ const Page = () => {
                     setTributeAmount(e.target.value);
                     setLowEnergyError(false);
                   }}
-                  className="font-mono text-center text-3xl h-16 bg-black/50 border-white/10 w-full focus:border-primary/50 transition-colors"
+                  className="font-mono text-center text-3xl h-16 bg-background/50 border-primary/10 w-full focus:border-primary/50 transition-colors"
                 />
               </div>
               <Button
@@ -174,7 +174,7 @@ const Page = () => {
   // Gallery / Completed View
   return (
     <div className="space-y-6 p-4 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="flex items-center justify-between border-b border-primary/10 pb-4">
         <div>
           <h2
             className={cn(
@@ -185,18 +185,18 @@ const Page = () => {
             {dailyDrop.title}
           </h2>
           {isCompleted && (
-            <p className="px-2 text-xs text-green-400 font-mono mt-1">
+            <p className="px-2 text-xs text-green-500 font-mono mt-1">
               You reviewed today's drop!
             </p>
           )}
           {!isCompleted && !hasEnergy && (
-            <p className="px-2 text-xs text-red-400 font-mono mt-1">
+            <p className="px-2 text-xs text-destructive font-mono mt-1">
               Out of energy. Come back tomorrow!
             </p>
           )}
         </div>
 
-        <div className="text-xl font-mono font-bold text-white border border-white/20 px-3 py-1 rounded bg-white/5">
+        <div className="text-xl font-mono font-bold text-primary border border-primary/20 px-3 py-1 rounded bg-primary/5">
           {dailyDrop.date.split("-").reverse().join("-")}
         </div>
       </div>
@@ -212,17 +212,17 @@ const Page = () => {
                 isVoted
                   ? cn(
                     getDropImageGlow(dailyDrop.images.length),
-                    "border-white/5 bg-black/20",
+                    "border-primary/5 bg-background/20",
                   )
-                  : "grayscale opacity-60 border-white/5 bg-black/50 hover:opacity-100",
+                  : "grayscale opacity-60 border-primary/5 bg-background/50 hover:opacity-100",
               )}
             >
-              <div className="absolute top-2 left-2 z-10 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white border border-white/10">
+              <div className="absolute top-2 left-2 z-10 bg-background/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-primary border border-primary/10">
                 #{idx + 1}
               </div>
 
               {isVoted && (
-                <div className="absolute top-2 right-2 z-10 bg-green-500/20 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-green-400 border border-green-500/50">
+                <div className="absolute top-2 right-2 z-10 bg-green-500/20 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-green-500 border border-green-500/50">
                   Voted
                 </div>
               )}
@@ -233,15 +233,15 @@ const Page = () => {
                 className="w-full h-150 object-contain transition-transform duration-500 group-hover:scale-110"
               />
 
-              <div className="absolute bottom-0 left-0 w-full p-4 bg-linear-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <div className="absolute bottom-0 left-0 w-full p-4 font-bold bg-linear-to-t from-background/90 to-background/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-white">
+                  <span className="text-sm text-primary">
                     My Tributes
                   </span>
                   <span
                     className={cn(
                       "font-mono",
-                      isVoted ? "text-yellow-400" : "text-gray-400",
+                      isVoted ? "text-accent-foreground" : "text-gray-400",
                     )}
                   >
                     {dailyDrop.userState?.tributes?.[img._id] ?? 0}
@@ -253,14 +253,14 @@ const Page = () => {
         })}
       </div>
 
-      <div className="flex justify-center py-8 text-center text-xl font-bold text-white/80">
+      <div className="flex justify-center py-8 text-center text-xl font-bold text-primary/80">
         {isCompleted ? (
           <div className="space-y-4">
-            <p className="animate-pulse text-primary">New drop will come tomorrow.</p>
+            <p className="text-primary">New drop will come tomorrow.</p>
             <Link href="/leaderboard">
               <Button
                 size="lg"
-                className="font-black tracking-widest text-lg shadow-xl shadow-yellow-500/20 bg-yellow-500 hover:bg-yellow-400 text-black border-2 border-yellow-600 hover:scale-105 transition-transform"
+                className="font-black tracking-widest text-lg shadow-xl shadow-accent/20 bg-accent hover:bg-accent/90 text-accent-foreground border-2 border-accent hover:scale-105 transition-transform"
               >
                 VIEW LEADERBOARD
               </Button>
