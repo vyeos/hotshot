@@ -13,8 +13,8 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const { title, imageStorageIds } = args;
 
-    if (imageStorageIds.length === 0 || imageStorageIds.length > 5) {
-      throw new Error("A daily drop must have between 1 and 5 images.");
+    if (imageStorageIds.length > 5) {
+      throw new Error("A daily drop can have at most 5 images.");
     }
 
     const date = new Date().toISOString().split("T")[0]; // YYYY-MM-DD

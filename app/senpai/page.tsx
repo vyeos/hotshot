@@ -10,6 +10,7 @@ import { Loader2, Upload, X } from "lucide-react";
 import { useRouter, notFound } from "next/navigation";
 import Image from "next/image";
 import { useCurrentUser } from "@/components/UserProvider";
+import { cn } from "@/lib/utils";
 
 export default function SenpaiDashboard() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function SenpaiDashboard() {
 
       const objectUrl = URL.createObjectURL(file);
       const newPreviews = [...previews];
-      if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]!); 
+      if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]!);
       newPreviews[index] = objectUrl;
       setPreviews(newPreviews);
     }
@@ -66,7 +67,6 @@ export default function SenpaiDashboard() {
     if (!title) return alert("Please enter a title");
 
     const activeImages = images.filter((img): img is File => img !== null);
-    if (activeImages.length === 0) return alert("Please upload at least 1 image");
 
     setIsUploading(true);
     try {
@@ -166,15 +166,18 @@ export default function SenpaiDashboard() {
             size="lg"
             onClick={handleSubmit}
             disabled={isUploading}
-            className="w-full md:w-auto min-w-[200px]"
+            className={cn(
+              "w-full md:w-auto min-w-[200px]",
+              images.filter((img) => img !== null).length === 0 && "bg-destructive hover:bg-destructive/90"
+            )}
           >
             {isUploading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uploading...
+                Processing...
               </>
             ) : (
-              "Publish Drop"
+              images.filter((img) => img !== null).length === 0 ? "Skip Drop (No Images)" : "Publish Drop"
             )}
           </Button>
         </div>

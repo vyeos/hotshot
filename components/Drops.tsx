@@ -66,10 +66,25 @@ const Drops = () => {
   if (dailyDrop === null) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-        <p className="text-xl font-bold tracking-widest uppercase">
-          No Drops Today
+        <p className="text-4xl font-black tracking-widest uppercase text-primary mb-4">
+          No Drops Yet
         </p>
-        <p className="text-sm">Check back later, Senpai!</p>
+        <p className="text-xl font-medium text-white/80">
+          Check back later, Senpai!
+        </p>
+      </div>
+    );
+  }
+
+  if (dailyDrop.images.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground px-4 text-center">
+        <p className="text-4xl font-black tracking-widest uppercase text-destructive mb-4">
+          No Drop Today
+        </p>
+        <p className="text-xl font-medium text-white/80">
+          A release will come tomorrow!
+        </p>
       </div>
     );
   }
