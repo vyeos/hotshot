@@ -1,28 +1,42 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Upload, X } from "lucide-react";
-import { useRouter, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import { useCurrentUser } from "@/components/UserProvider";
 import { cn } from "@/lib/utils";
 
+import { MorphingText } from "@/components/ui/morphing-text";
+
 export default function SenpaiDashboard() {
-  const router = useRouter();
   const { user } = useCurrentUser();
 
   const generateUploadUrl = useMutation(api.daily_drops.generateUploadUrl);
   const createDrop = useMutation(api.daily_drops.create);
 
   const [title, setTitle] = useState("");
-  const [images, setImages] = useState<(File | null)[]>([null, null, null, null, null]);
-  const [previews, setPreviews] = useState<(string | null)[]>([null, null, null, null, null]);
+  const [images, setImages] = useState<(File | null)[]>([
+    null,
+    null,
+    null,
+    null,
+    null,
+  ]);
+  const [previews, setPreviews] = useState<(string | null)[]>([
+    null,
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -33,7 +47,10 @@ export default function SenpaiDashboard() {
     notFound();
   }
 
-  const handleImageSelect = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const newImages = [...images];
@@ -80,7 +97,7 @@ export default function SenpaiDashboard() {
           });
           const { storageId } = await result.json();
           return storageId;
-        })
+        }),
       );
 
       await createDrop({
@@ -88,7 +105,9 @@ export default function SenpaiDashboard() {
         imageStorageIds: storageIds,
       });
 
-      alert("Daily Drop Created Successfully!");
+      setIsSuccess(true);
+      setTimeout(() => setIsSuccess(false), 3000);
+
       setTitle("");
       setImages([null, null, null, null, null]);
       setPreviews([null, null, null, null, null]);
@@ -100,9 +119,13 @@ export default function SenpaiDashboard() {
     }
   };
 
+  const hasImages = images.filter((img) => img !== null).length > 0;
+
   return (
     <div className="container mx-auto max-w-4xl py-10 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-primary">Create Daily Drop</h1>
+      <h1 className="text-3xl font-bold mb-8 text-primary">
+        Create Daily Drop
+      </h1>
 
       <div className="space-y-8">
         {/* Title Input */}
@@ -119,15 +142,18 @@ export default function SenpaiDashboard() {
         {/* Image Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((_, index) => (
-            <Card key={index} className="relative aspect-auto border-dashed border-2 overflow-hidden flex flex-col group hover:border-primary transition-colors">
+            <Card
+              key={index}
+              className="relative aspect-auto border-dashed border-2 overflow-hidden flex flex-col group hover:border-primary transition-colors"
+            >
               <CardContent className="p-0 h-full flex items-center justify-center bg-muted/20">
                 {previews[index] ? (
-                  <div className="relative w-full h-full min-h-[200px]">
+                  <div className="relative w-full h-full min-h-50">
                     <Image
                       src={previews[index]!}
                       alt={`Upload ${index + 1}`}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
                     <button
                       onClick={() => removeImage(index)}
@@ -141,18 +167,22 @@ export default function SenpaiDashboard() {
                   </div>
                 ) : (
                   <div
-                    className="flex flex-col items-center justify-center p-6 cursor-pointer w-full h-full min-h-[200px]"
+                    className="flex flex-col items-center justify-center p-6 cursor-pointer w-full h-full min-h-50"
                     onClick={() => fileInputRefs.current[index]?.click()}
                   >
                     <Upload className="w-10 h-10 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground font-medium">Select Image #{index + 1}</span>
+                    <span className="text-sm text-muted-foreground font-medium">
+                      Select Image #{index + 1}
+                    </span>
                   </div>
                 )}
                 <input
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  ref={(el) => { fileInputRefs.current[index] = el; }}
+                  ref={(el) => {
+                    fileInputRefs.current[index] = el;
+                  }}
                   onChange={(e) => handleImageSelect(index, e)}
                 />
               </CardContent>
@@ -165,10 +195,12 @@ export default function SenpaiDashboard() {
           <Button
             size="lg"
             onClick={handleSubmit}
-            disabled={isUploading}
+            disabled={isUploading || isSuccess}
             className={cn(
-              "w-full md:w-auto min-w-[200px]",
-              images.filter((img) => img !== null).length === 0 && "bg-destructive hover:bg-destructive/90"
+              "w-full md:w-auto min-w-40",
+              !hasImages && !isSuccess && !isUploading &&
+              "bg-destructive hover:bg-destructive/90",
+              isSuccess && "bg-primary hover:bg-secondary text-secondary"
             )}
           >
             {isUploading ? (
@@ -177,7 +209,13 @@ export default function SenpaiDashboard() {
                 Processing...
               </>
             ) : (
-              images.filter((img) => img !== null).length === 0 ? "Skip Drop (No Images)" : "Publish Drop"
+              <MorphingText className="font-bold">
+                {isSuccess
+                  ? "Daily Drop Created!"
+                  : !hasImages
+                    ? "Skip Drop (No Images)"
+                    : "Publish Drop"}
+              </MorphingText>
             )}
           </Button>
         </div>
@@ -185,4 +223,3 @@ export default function SenpaiDashboard() {
     </div>
   );
 }
-
