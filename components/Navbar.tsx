@@ -11,6 +11,7 @@ import {
   AnimeArchiveIcon,
   AnimeRankingIcon,
   AnimeUserIcon,
+  AnimeEnergyIcon,
 } from "./ui/AnimeIcons";
 import {
   DropdownMenu,
@@ -19,7 +20,6 @@ import {
 } from "./ui/dropdown-menu";
 import { useCurrentUser } from "./UserProvider";
 import { useState } from "react";
-import { useRouter } from "next/router";
 
 interface NavLinkProps {
   name: string;
@@ -105,17 +105,19 @@ const Navbar = () => {
                   "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 group relative overflow-hidden outline-none ring-0",
                   isProfileOpen
                     ? "bg-primary/10 text-primary"
-                    : "hover:bg-secondary/20 text-muted-foreground hover:text-foreground"
+                    : "hover:bg-secondary/20 text-muted-foreground hover:text-foreground",
                 )}
               >
                 {isProfileOpen && (
                   <div className="absolute inset-0 bg-primary/5 opacity-50 animate-pulse" />
                 )}
 
-                <span className={cn(
-                  "transition-transform duration-300",
-                  isProfileOpen ? "scale-110" : "group-hover:scale-110"
-                )}>
+                <span
+                  className={cn(
+                    "transition-transform duration-300",
+                    isProfileOpen ? "scale-110" : "group-hover:scale-110",
+                  )}
+                >
                   <AnimeUserIcon className="w-6 h-6" />
                 </span>
 
@@ -128,18 +130,27 @@ const Navbar = () => {
                 )}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-card/95 backdrop-blur-xl border-white/10 rounded-xl shadow-2xl p-4 space-y-4">
+            <DropdownMenuContent
+              align="end"
+              className="w-64 bg-card/95 backdrop-blur-xl border-primary/10 rounded-xl shadow-2xl p-4 space-y-4"
+            >
               <div className="space-y-1">
-                <p className="font-bold text-lg text-white">{user.username}</p>
-                <p className="text-xs text-muted-foreground truncate" title={user.email}>
+                <p className="font-bold text-lg text-primary">
+                  {user.username}
+                </p>
+                <p
+                  className="text-xs text-muted-foreground truncate"
+                  title={user.email}
+                >
                   {user.email}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-secondary/10 rounded-lg border border-white/5">
+              <div className="flex items-center justify-between p-3 bg-secondary/10 rounded-lg border border-bacakground/5">
                 <span className="text-sm text-muted-foreground">Energy</span>
-                <span className="font-mono font-bold text-yellow-400">
-                  {user.energy ?? 0} ⚡
+                <span className="font-mono font-bold text-accent-foreground flex items-center gap-2">
+                  {user.energy ?? 0}{" "}
+                  <AnimeEnergyIcon className="w-4 h-4 text-accent-foreground" />
                 </span>
               </div>
 
@@ -154,13 +165,11 @@ const Navbar = () => {
           </DropdownMenu>
         ) : (
           <Link href="/login">
-            <Button className="font-bold tracking-wider px-6">
-              LOG IN
-            </Button>
+            <Button className="font-bold tracking-wider px-6">LOG IN</Button>
           </Link>
         )}
       </div>
-    </div >
+    </div>
   );
 };
 
