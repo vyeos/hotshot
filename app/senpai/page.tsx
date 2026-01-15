@@ -39,6 +39,7 @@ export default function SenpaiDashboard() {
   ]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [titleError, setTitleError] = useState(false);
 
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -83,7 +84,10 @@ export default function SenpaiDashboard() {
   };
 
   const handleSubmit = async () => {
-    if (!title) return alert("Please enter a title");
+    if (!title) {
+      setTitleError(true);
+      return;
+    }
 
     const activeImages = images.filter((img): img is File => img !== null);
 
@@ -184,7 +188,10 @@ export default function SenpaiDashboard() {
           <Input
             placeholder="e.g. Summer Beach Episode"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setTitleError(false);
+            }}
             className="text-lg"
           />
         </div>
@@ -250,7 +257,8 @@ export default function SenpaiDashboard() {
               "w-full md:w-auto min-w-40",
               !hasImages && !isSuccess && !isUploading &&
               "bg-destructive hover:bg-destructive/90",
-              isSuccess && "bg-primary hover:bg-secondary text-secondary"
+              isSuccess && "bg-primary hover:bg-secondary text-secondary",
+              titleError && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
             )}
           >
             {isUploading ? (
@@ -262,9 +270,11 @@ export default function SenpaiDashboard() {
               <MorphingText className="font-bold">
                 {isSuccess
                   ? "Daily Drop Created!"
-                  : !hasImages
-                    ? "Skip Drop (No Images)"
-                    : "Publish Drop"}
+                  : titleError
+                    ? "PLEASE ENTER A TITLE"
+                    : !hasImages
+                      ? "Skip Drop (No Images)"
+                      : "Publish Drop"}
               </MorphingText>
             )}
           </Button>
