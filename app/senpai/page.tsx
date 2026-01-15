@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Upload, X } from "lucide-react";
+import { AnimeLoaderIcon, AnimeUploadIcon, AnimeCloseIcon } from "@/components/ui/AnimeIcons";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -128,7 +128,7 @@ export default function SenpaiDashboard() {
   if (isDropped === undefined) {
     return (
       <div className="h-[50vh] flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <AnimeLoaderIcon className="w-10 h-10 text-primary animate-spin" />
       </div>
     );
   }
@@ -216,7 +216,7 @@ export default function SenpaiDashboard() {
                       onClick={() => removeImage(index)}
                       className="absolute top-2 right-2 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <X size={16} />
+                      <AnimeCloseIcon className="w-4 h-4" />
                     </button>
                     <div className="absolute bottom-2 left-2 bg-background/80 px-2 py-1 rounded text-xs font-bold">
                       #{index + 1}
@@ -227,7 +227,7 @@ export default function SenpaiDashboard() {
                     className="flex flex-col items-center justify-center p-6 cursor-pointer w-full h-full min-h-50"
                     onClick={() => fileInputRefs.current[index]?.click()}
                   >
-                    <Upload className="w-10 h-10 text-muted-foreground mb-2" />
+                    <AnimeUploadIcon className="w-10 h-10 text-muted-foreground mb-2" />
                     <span className="text-sm text-muted-foreground font-medium">
                       Select Image #{index + 1}
                     </span>
@@ -263,7 +263,7 @@ export default function SenpaiDashboard() {
           >
             {isUploading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <AnimeLoaderIcon className="mr-2 h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (

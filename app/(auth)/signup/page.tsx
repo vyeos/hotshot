@@ -8,6 +8,7 @@ import {
   AnimeAlert,
   AnimeEye,
   AnimeEyeOff,
+  AnimeLoaderIcon,
 } from "@/components/ui/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
@@ -15,7 +16,6 @@ import z from "zod";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
@@ -309,7 +309,7 @@ const page = () => {
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <AnimeLoaderIcon className="mr-2 h-4 w-4 animate-spin" />
                 Almost there...
               </>
             ) : (

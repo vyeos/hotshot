@@ -8,6 +8,7 @@ import {
   AnimeAlert,
   AnimeEye,
   AnimeEyeOff,
+  AnimeLoaderIcon,
 } from "@/components/ui/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
@@ -15,7 +16,6 @@ import z from "zod";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
@@ -213,20 +213,20 @@ const page = () => {
           )}
 
           <Button
-    type="submit"
-    className={`w-full font-semibold ${errors && "border border-destructive"}`}
-    size="lg"
-    disabled={isLoading}
-  >
-    {isLoading ? (
-      <>
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Almost there...
-      </>
-    ) : (
-      "Back to business"
-    )}
-  </Button>
+            type="submit"
+            className={`w-full font-semibold ${errors && "border border-destructive"}`}
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <AnimeLoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+                Almost there...
+              </>
+            ) : (
+              "Back to business"
+            )}
+          </Button>
 
           <div className="text-center text-sm text-muted-foreground">
             Become a fan of the website?{" "}

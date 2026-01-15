@@ -9,9 +9,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  AnimeTodayIcon,
-  AnimeArchiveIcon,
-  AnimeRankingIcon,
+  AnimeDropsIcon,
+  AnimeVaultIcon,
+  AnimeLeaderboardIcon,
   AnimeUserIcon,
   AnimeEnergyIcon,
   AnimePenIcon,
@@ -79,17 +79,17 @@ const Navbar = () => {
     {
       name: "DROPS",
       url: "/",
-      icon: <AnimeTodayIcon className="w-6 h-6" />,
+      icon: <AnimeDropsIcon className="w-6 h-6" />,
     },
     {
       name: "VAULT",
       url: "/vault",
-      icon: <AnimeArchiveIcon className="w-6 h-6" />,
+      icon: <AnimeVaultIcon className="w-6 h-6" />,
     },
     {
       name: "LEADERBOARD",
       url: "/leaderboard",
-      icon: <AnimeRankingIcon className="w-6 h-6" />,
+      icon: <AnimeLeaderboardIcon className="w-6 h-6" />,
     },
   ];
 

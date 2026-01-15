@@ -110,7 +110,7 @@ export const AnimeAlert = ({ className = "w-6 h-6", ...props }: React.SVGProps<S
   </svg>
 );
 
-export const AnimeTodayIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+export const AnimeDropsIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -128,12 +128,10 @@ export const AnimeTodayIcon = ({ className = "w-6 h-6", ...props }: React.SVGPro
     <line x1="3" y1="10" x2="21" y2="10" />
     <path d="M7 14h2" strokeWidth="1.5" />
     <path d="M7 18h5" strokeWidth="1.5" />
-    <path d="M21 6l2-2" strokeWidth="1.5" />
-    <path d="M1 6l-2-2" strokeWidth="1.5" />
   </svg>
 );
 
-export const AnimeArchiveIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+export const AnimeVaultIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -149,11 +147,10 @@ export const AnimeArchiveIcon = ({ className = "w-6 h-6", ...props }: React.SVGP
     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
     <path d="M14 6l2 2" strokeWidth="1.5" />
     <path d="M14 10l2 2" strokeWidth="1.5" />
-    <path d="M2 5l-1-1" strokeWidth="1" />
   </svg>
 );
 
-export const AnimeRankingIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+export const AnimeLeaderboardIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -165,13 +162,9 @@ export const AnimeRankingIcon = ({ className = "w-6 h-6", ...props }: React.SVGP
     className={className}
     {...props}
   >
-    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
     <path d="M4 22h16" />
     <path d="M12 2l3 3h4a2 2 0 0 1 2 2v3c0 3-2 6-6 8a13 13 0 0 1-6 0c-4-2-6-5-6-8V7a2 2 0 0 1 2-2h4l3-3z" />
-    <path d="M12 6v6" strokeWidth="1" className="opacity-50" />
-    <path d="M23 2l-2 2" strokeWidth="1.5" />
-    <path d="M1 2l2 2" strokeWidth="1.5" />
+    <path d="M12 6v6" strokeWidth="1" />
   </svg>
 );
 
@@ -275,6 +268,130 @@ export const AnimeCloseIcon = ({ className = "w-6 h-6", ...props }: React.SVGPro
     {...props}
   >
     <path d="M18 6L6 18" />
+    <path d="M18 6L6 18" />
     <path d="M6 6l12 12" />
+  </svg>
+);
+
+export const AnimeTrophyIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" />
+    <path d="M12 2l3 3h4a2 2 0 0 1 2 2v3c0 3-2 6-6 8a13 13 0 0 1-6 0c-4-2-6-5-6-8V7a2 2 0 0 1 2-2h4l3-3z" />
+  </svg>
+);
+
+export const AnimeMedalIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <circle cx="12" cy="10" r="3" />
+    <path d="M7 21l5-4 5 4" />
+    <path d="M8 14.5l-3-6 3-6.5h8l3 6.5-3 6" />
+  </svg>
+);
+
+export const AnimeTimerIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <circle cx="12" cy="13" r="8" />
+    <path d="M12 9v4l2 2" />
+    <path d="M5 3 2 6" />
+    <path d="M22 6 19 3" />
+    <path d="M12 1v4" />
+  </svg>
+);
+
+export const AnimeLoaderIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M12 2L14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5z" />
+  </svg>
+);
+
+export const AnimeUploadIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
+export const AnimeChevronRightIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M9 18l6-6-6-6" />
+  </svg>
+);
+
+export const AnimeCircleIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10" />
   </svg>
 );

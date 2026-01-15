@@ -4,9 +4,8 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { AnimeEnergyIcon, AnimeSleepIcon, AnimeCloseIcon } from "@/components/ui/AnimeIcons";
+import { AnimeEnergyIcon, AnimeSleepIcon, AnimeCloseIcon, AnimeTrophyIcon } from "@/components/ui/AnimeIcons";
 import { cn } from "@/lib/utils";
-import { X, Trophy } from "lucide-react";
 import { getDropTitleGradient } from "@/lib/gradients";
 
 export default function VaultPage() {
@@ -134,7 +133,7 @@ export default function VaultPage() {
                     >
                       {isWinner && (
                         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 bg-accent text-accent-foreground font-black px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
-                          <Trophy className="w-4 h-4 fill-accent-foreground text-accent-foreground" />
+                          <AnimeTrophyIcon className="w-4 h-4 fill-accent-foreground text-accent-foreground" />
                           WHITE FACED
                         </div>
                       )}
