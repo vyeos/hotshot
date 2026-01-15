@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Upload, X } from "lucide-react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useCurrentUser } from "@/components/UserProvider";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ export default function SenpaiDashboard() {
 
   const generateUploadUrl = useMutation(api.daily_drops.generateUploadUrl);
   const createDrop = useMutation(api.daily_drops.create);
+  const isDropped = useQuery(api.daily_drops.getDailyDrop);
 
   const [title, setTitle] = useState("");
   const [images, setImages] = useState<(File | null)[]>([
@@ -118,6 +120,54 @@ export default function SenpaiDashboard() {
       setIsUploading(false);
     }
   };
+
+  if (isDropped === undefined) {
+    return (
+      <div className="h-[50vh] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isDropped) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8 px-4">
+        <div className="space-y-2">
+          <h1 className="px-6 text-5xl md:text-6xl font-black italic tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-500 to-pink-500 drop-shadow-2xl">
+            WAIFUS UNLEASHED!
+          </h1>
+          <p className="text-2xl font-bold text-white/80">
+            Today's drop is live, Senpai.
+          </p>
+        </div>
+
+        <Card className="w-full max-w-md bg-black/20 border-primary/20 backdrop-blur-sm">
+          <CardContent className="p-6 space-y-4">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground uppercase tracking-widest font-bold">Current Drop</p>
+              <p className="text-2xl font-bold text-primary">"{isDropped.title}"</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="p-3 rounded-lg bg-secondary/10 border border-white/5">
+                <p className="text-2xl font-mono font-bold">{isDropped.images.length}</p>
+                <p className="text-xs text-muted-foreground font-bold uppercase">Images</p>
+              </div>
+              <div className="p-3 rounded-lg bg-secondary/10 border border-white/5">
+                <p className="text-2xl font-mono font-bold">{isDropped.date.split("-").reverse().join("/")}</p>
+                <p className="text-xs text-muted-foreground font-bold uppercase">Date</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Link href="/">
+          <Button size="lg" className="h-14 px-8 text-lg font-black tracking-wide shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+            VIEW LIVE DROP
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   const hasImages = images.filter((img) => img !== null).length > 0;
 
