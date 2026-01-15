@@ -7,6 +7,7 @@ import { getDropTitleGradient, getDropImageGlow } from "@/lib/gradients";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { AnimeEnergyIcon } from "./ui/AnimeIcons";
 
 const Drops = () => {
   const dailyDrop = useQuery(api.daily_drops.getDailyDrop);
@@ -120,8 +121,8 @@ const Drops = () => {
         <div className="space-y-4 p-4 bg-secondary/10 rounded-xl border border-white/5">
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground">Your Energy</span>
-            <span className="font-mono font-bold text-yellow-400">
-              {dailyDrop.userState?.energy ?? 0} ⚡
+            <span className="font-mono font-bold text-accent-foreground flex items-center gap-2">
+              {dailyDrop.userState?.energy ?? 0} <AnimeEnergyIcon className="w-4 h-4" />
             </span>
           </div>
 

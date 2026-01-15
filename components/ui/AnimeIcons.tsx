@@ -174,3 +174,74 @@ export const AnimeRankingIcon = ({ className = "w-6 h-6", ...props }: React.SVGP
     <path d="M1 2l2 2" strokeWidth="1.5" />
   </svg>
 );
+
+export const AnimeUserIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    {/* Hair and Face Outline */}
+    <path d="M12 2C8 2 6 4 5 6c-2 0-3 2-3 4 0 3 2 4 2 4s-1 4 3 6c2 1 3 2 5 2s3-1 5-2c4-2 3-6 3-6s2-1 2-4c0-2-1-4-3-4-1-2-3-4-7-4z" />
+    {/* Heart Eyes */}
+    <path d="M8.5 11c0-1.5 1.5-2 2-1 .5-1 2-.5 2 1 0 1.5-2 2.5-2 2.5S8.5 12.5 8.5 11z" fill="currentColor" stroke="none" />
+    <path d="M13.5 11c0-1.5 1.5-2 2-1 .5-1 2-.5 2 1 0 1.5-2 2.5-2 2.5S13.5 12.5 13.5 11z" fill="currentColor" stroke="none" />
+    {/* Smile */}
+    <path d="M9.5 16s1.5 1 2.5 1 2.5-1 2.5-1" />
+  </svg>
+);
+
+export const AnimeEnergyIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+  </svg>
+);
+
+export const AnimePenIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </svg>
+);
+
+export const AnimeCheckIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+  stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M20 6L9 17l-5-5" />
+  </svg>
+);

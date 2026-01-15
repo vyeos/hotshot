@@ -6,6 +6,8 @@ import {
   AnimeGithubIcon,
   AnimeGoogleIcon,
   AnimeAlert,
+  AnimeEye,
+  AnimeEyeOff,
 } from "@/components/ui/AnimeIcons";
 import Link from "next/link";
 import { useState } from "react";
@@ -13,15 +15,20 @@ import z from "zod";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const page = () => {
   const [isShaking, setIsShaking] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const { signIn } = useAuthActions();
   const convex = useConvex();
   const router = useRouter();
 
   const handlePasswordLogin = async (formData: any) => {
+    setIsLoading(true);
+    setErrors("");
     try {
       let email = formData.email;
 
@@ -45,6 +52,7 @@ const page = () => {
       });
       router.push("/");
     } catch (error) {
+      setIsLoading(false);
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       setErrors("Invalid email/username or password");
@@ -167,18 +175,31 @@ const page = () => {
                       Forgot password?
                     </Link>
                   </div>
-                  <input
-                    type="password"
-                    placeholder="your secret"
-                    id={field.name}
-                    onBlur={field.handleBlur}
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                      setErrors("");
-                    }}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="your secret"
+                      id={field.name}
+                      onBlur={field.handleBlur}
+                      value={field.state.value}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        setErrors("");
+                      }}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <AnimeEyeOff className="h-4 w-4" />
+                      ) : (
+                        <AnimeEye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </>
               )}
             />
@@ -192,12 +213,20 @@ const page = () => {
           )}
 
           <Button
-            type="submit"
-            className={`w-full font-semibold ${errors && "border border-destructive"}`}
-            size="lg"
-          >
-            Back to business
-          </Button>
+    type="submit"
+    className={`w-full font-semibold ${errors && "border border-destructive"}`}
+    size="lg"
+    disabled={isLoading}
+  >
+    {isLoading ? (
+      <>
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        Almost there...
+      </>
+    ) : (
+      "Back to business"
+    )}
+  </Button>
 
           <div className="text-center text-sm text-muted-foreground">
             Become a fan of the website?{" "}
