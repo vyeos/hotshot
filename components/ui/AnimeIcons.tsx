@@ -273,7 +273,7 @@ export const AnimeCloseIcon = ({ className = "w-6 h-6", ...props }: React.SVGPro
   </svg>
 );
 
-export const AnimeTrophyIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
+export const AnimeCrownIcon = ({ className = "w-6 h-6", ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -285,10 +285,7 @@ export const AnimeTrophyIcon = ({ className = "w-6 h-6", ...props }: React.SVGPr
     className={className}
     {...props}
   >
-    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-    <path d="M4 22h16" />
-    <path d="M12 2l3 3h4a2 2 0 0 1 2 2v3c0 3-2 6-6 8a13 13 0 0 1-6 0c-4-2-6-5-6-8V7a2 2 0 0 1 2-2h4l3-3z" />
+    <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
   </svg>
 );
 
