@@ -1,5 +1,7 @@
 "use client";
 
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Button } from "./ui/button";
 import Logo from "./Logo";
@@ -42,45 +44,32 @@ const Navbar = () => {
   const pathname = usePathname();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [newUsername, setNewUsername] = useState("");
-  const [isChecking, setIsChecking] = useState(false);
 
-  const handleSaveUsername = async () => {
-    if (!newUsername.trim() || newUsername === user?.username) {
-      setIsEditingUsername(false);
-      return;
-    }
+  const form = useForm({
+    defaultValues: {
+      username: user?.username ?? "",
+    },
+    onSubmit: async ({ value }) => {
+      const { username } = value;
 
-    if (newUsername.length < 3 || newUsername.length > 20) {
-      alert("Username must be between 3 and 20 characters");
-      return;
-    }
+      try {
+        const isTaken = await convex.query(api.users.isUsernameTaken, {
+          username,
+        });
 
-    if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
-      alert("Username can only contain letters, numbers, and underscores");
-      return;
-    }
+        if (isTaken && username !== user?.username) {
+          form.setFieldMeta("username", (prev) => ({ ...prev, errorMap: { onChange: "Username is already taken" } }));
+          return;
+        }
 
-    setIsChecking(true);
-    try {
-      const isTaken = await convex.query(api.users.isUsernameTaken, {
-        username: newUsername,
-      });
-
-      if (isTaken) {
-        alert("Username is already taken");
-        return;
+        await setUsername({ username });
+        setIsEditingUsername(false);
+      } catch (error) {
+        console.error("Failed to update username:", error);
+        form.setFieldMeta("username", (prev) => ({ ...prev, errorMap: { onChange: "Failed to update. Try again." } }));
       }
-
-      await setUsername({ username: newUsername });
-      setIsEditingUsername(false);
-    } catch (error) {
-      console.error("Failed to update username:", error);
-      alert("Failed to update username. Please try again.");
-    } finally {
-      setIsChecking(false);
-    }
-  };
+    },
+  });
 
   if (pathname === "/login" || pathname === "/signup") {
     return null;
@@ -185,31 +174,85 @@ const Navbar = () => {
             >
               <div className="space-y-1">
                 {isEditingUsername ? (
-                  <div className="flex items-center gap-2 text-primary w-full">
-                    <Input
-                      className="font-bold text-lg h-8 bg-black/20 border-primary/20"
-                      value={newUsername}
-                      onChange={(e) => setNewUsername(e.target.value)}
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleSaveUsername();
-                        if (e.key === "Escape") setIsEditingUsername(false);
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      form.handleSubmit();
+                    }}
+                    className="w-full"
+                  >
+                    <form.Field
+                      name="username"
+                      validators={{
+                        onChange: z
+                          .string()
+                          .min(3, "Min 3 characters")
+                          .max(20, "Max 20 characters")
+                          .regex(
+                            /^[a-zA-Z0-9_]+$/,
+                            "Only letters, numbers, _",
+                          ),
                       }}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleSaveUsername}
-                      disabled={isChecking}
-                      className="h-6 w-6 text-primary hover:text-primary cursor-pointer shrink-0"
-                    >
-                      {isChecking ? (
-                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      ) : (
-                        <AnimeCheckIcon className="h-4 w-4" />
+                      children={(field) => (
+                        <div className="flex flex-col gap-1 w-full">
+                          <div className="flex items-center gap-2 text-primary w-full">
+                            <Input
+                              className={cn(
+                                "font-bold text-lg h-8 bg-black/20 border-primary/20",
+                                field.state.meta.errors.length > 0 &&
+                                "border-destructive",
+                              )}
+                              value={field.state.value}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              onBlur={field.handleBlur}
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === "Escape")
+                                  setIsEditingUsername(false);
+                              }}
+                            />
+                            <form.Subscribe
+                              selector={(state) => [
+                                state.canSubmit,
+                                state.isSubmitting,
+                              ]}
+                              children={([canSubmit, isSubmitting]) => (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  type="submit"
+                                  disabled={!canSubmit || isSubmitting}
+                                  className="h-6 w-6 text-primary hover:text-primary cursor-pointer shrink-0"
+                                >
+                                  {isSubmitting ? (
+                                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                  ) : (
+                                    <AnimeCheckIcon className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              )}
+                            />
+                          </div>
+                          {field.state.meta.errors.length > 0 ? (
+                            <ul className="text-destructive text-xs ml-4 list-disc">
+                              {field.state.meta.errors.map((error, i) => (
+                                <li key={i}>
+                                  {typeof error === "object" &&
+                                    error !== null &&
+                                    "message" in error
+                                    ? (error as any).message
+                                    : String(error)}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
+                        </div>
                       )}
-                    </Button>
-                  </div>
+                    />
+                  </form>
                 ) : (
                   <div className="flex items-center gap-2 text-primary">
                     <p className="font-bold text-lg">{user.username}</p>
@@ -217,7 +260,7 @@ const Navbar = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        setNewUsername(user.username ?? "");
+                        form.setFieldValue("username", user.username ?? "");
                         setIsEditingUsername(true);
                       }}
                       className="h-6 w-6 text-muted-foreground hover:text-primary cursor-pointer"
