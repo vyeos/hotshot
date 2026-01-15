@@ -40,7 +40,6 @@ export const create = mutation({
 });
 
 import { auth } from "./auth";
-import { Id } from "./_generated/dataModel";
 
 export const giveTribute = mutation({
   args: {
@@ -111,21 +110,21 @@ export const getDailyDrop = query({
       images.map(async (image) => ({
         ...image,
         url: await ctx.storage.getUrl(image.storageId),
-      }))
+      })),
     );
 
     let userState = null;
     if (userId) {
       const user = await ctx.db.get(userId);
       if (user) {
-        const votedImageIds = new Set<Id<"images">>();
+        // const votedImageIds = new Set<Id<"images">>();
 
         const userTributes = await ctx.db
           .query("tributes_given")
-          .withIndex("by_user", q => q.eq("user_id", userId))
+          .withIndex("by_user", (q) => q.eq("user_id", userId))
           .collect();
 
-        const imagesIds = new Set(images.map(i => i._id));
+        const imagesIds = new Set(images.map((i) => i._id));
         const tributes: Record<string, number> = {};
         for (const t of userTributes) {
           if (imagesIds.has(t.image_id)) {
@@ -147,3 +146,96 @@ export const getDailyDrop = query({
     };
   },
 });
+
+export const getVault = query({
+  args: {},
+  handler: async (ctx) => {
+    const today = new Date().toISOString().split("T")[0];
+
+    const drops = await ctx.db
+      .query("daily_drops")
+      .withIndex("by_date")
+      .order("desc")
+      .take(8);
+
+    // const pastDrops = drops.filter((d) => d.date < today).slice(0, 7);
+    const pastDrops = drops.filter((d) => d.date < today);
+
+    const dropsWithImages = await Promise.all(
+      pastDrops.map(async (drop) => {
+        const images = await ctx.db
+          .query("images")
+          .withIndex("by_drop", (q) => q.eq("drop_id", drop._id))
+          .collect();
+
+        const imagesWithUrls = await Promise.all(
+          images.map(async (image) => ({
+            ...image,
+            url: await ctx.storage.getUrl(image.storageId),
+          })),
+        );
+
+        const totalDropTributes = images.reduce(
+          (sum, img) => sum + img.total_tributes,
+          0,
+        );
+
+        const winner =
+          imagesWithUrls.length > 0
+            ? imagesWithUrls.reduce((prev, current) =>
+                prev.total_tributes > current.total_tributes ? prev : current,
+              )
+            : null;
+
+        return {
+          ...drop,
+          images: imagesWithUrls.sort(
+            (a, b) => a.sequence_idx - b.sequence_idx,
+          ),
+          winner,
+          totalDropTributes,
+        };
+      }),
+    );
+
+    return dropsWithImages;
+  },
+});
+
+export const getLeaderboard = query({
+  args: {},
+  handler: async (ctx) => {
+    const today = new Date().toISOString().split("T")[0];
+
+    const drop = await ctx.db
+      .query("daily_drops")
+      .withIndex("by_date", (q) => q.eq("date", today))
+      .first();
+
+    if (!drop) {
+      return null;
+    }
+
+    const images = await ctx.db
+      .query("images")
+      .withIndex("by_drop", (q) => q.eq("drop_id", drop._id))
+      .collect();
+
+    const imagesWithUrls = await Promise.all(
+      images.map(async (image) => ({
+        ...image,
+        url: await ctx.storage.getUrl(image.storageId),
+      })),
+    );
+
+    const sortedImages = imagesWithUrls.sort(
+      (a, b) => b.total_tributes - a.total_tributes,
+    );
+
+    return {
+      ...drop,
+      images: sortedImages,
+    };
+  },
+});
+
