@@ -12,7 +12,10 @@ import {
   AnimeRankingIcon,
   AnimeUserIcon,
   AnimeEnergyIcon,
+  AnimePenIcon,
+  AnimeCheckIcon,
 } from "./ui/AnimeIcons";
+import { Input } from "./ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +23,8 @@ import {
 } from "./ui/dropdown-menu";
 import { useCurrentUser } from "./UserProvider";
 import { useState } from "react";
+import { useConvex, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface NavLinkProps {
   name: string;
@@ -28,10 +33,54 @@ interface NavLinkProps {
 }
 
 const Navbar = () => {
-  const { signOut } = useAuthActions();
-  const pathname = usePathname();
   const { user } = useCurrentUser();
+  const { signOut } = useAuthActions();
+
+  const convex = useConvex();
+  const setUsername = useMutation(api.users.setUsername);
+
+  const pathname = usePathname();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleSaveUsername = async () => {
+    if (!newUsername.trim() || newUsername === user?.username) {
+      setIsEditingUsername(false);
+      return;
+    }
+
+    if (newUsername.length < 3 || newUsername.length > 20) {
+      alert("Username must be between 3 and 20 characters");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
+      alert("Username can only contain letters, numbers, and underscores");
+      return;
+    }
+
+    setIsChecking(true);
+    try {
+      const isTaken = await convex.query(api.users.isUsernameTaken, {
+        username: newUsername,
+      });
+
+      if (isTaken) {
+        alert("Username is already taken");
+        return;
+      }
+
+      await setUsername({ username: newUsername });
+      setIsEditingUsername(false);
+    } catch (error) {
+      console.error("Failed to update username:", error);
+      alert("Failed to update username. Please try again.");
+    } finally {
+      setIsChecking(false);
+    }
+  };
 
   if (pathname === "/login" || pathname === "/signup") {
     return null;
@@ -135,9 +184,49 @@ const Navbar = () => {
               className="w-64 bg-card/95 backdrop-blur-xl border-primary/10 rounded-xl shadow-2xl p-4 space-y-4"
             >
               <div className="space-y-1">
-                <p className="font-bold text-lg text-primary">
-                  {user.username}
-                </p>
+                {isEditingUsername ? (
+                  <div className="flex items-center gap-2 text-primary w-full">
+                    <Input
+                      className="font-bold text-lg h-8 bg-black/20 border-primary/20"
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveUsername();
+                        if (e.key === "Escape") setIsEditingUsername(false);
+                      }}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleSaveUsername}
+                      disabled={isChecking}
+                      className="h-6 w-6 text-primary hover:text-primary cursor-pointer shrink-0"
+                    >
+                      {isChecking ? (
+                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      ) : (
+                        <AnimeCheckIcon className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-primary">
+                    <p className="font-bold text-lg">{user.username}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setNewUsername(user.username ?? "");
+                        setIsEditingUsername(true);
+                      }}
+                      className="h-6 w-6 text-muted-foreground hover:text-primary cursor-pointer"
+                    >
+                      <AnimePenIcon className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+
                 <p
                   className="text-xs text-muted-foreground truncate"
                   title={user.email}
