@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { AnimeEnergyIcon } from "./ui/AnimeIcons";
+import { MorphingText } from "@/components/ui/morphing-text";
 
 const Drops = () => {
   const dailyDrop = useQuery(api.daily_drops.getDailyDrop);
@@ -15,6 +16,7 @@ const Drops = () => {
 
   const [tributeAmount, setTributeAmount] = useState<string>("1");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lowEnergyError, setLowEnergyError] = useState(false);
 
   // Determine which images have been voted on
   const tributes = dailyDrop?.userState?.tributes ?? {};
@@ -35,7 +37,7 @@ const Drops = () => {
     if (isNaN(amount) || amount <= 0) return;
 
     if (dailyDrop.userState.energy < amount) {
-      alert("Not enough energy!");
+      setLowEnergyError(true);
       return;
     }
 
@@ -46,9 +48,9 @@ const Drops = () => {
         amount: amount,
       });
       setTributeAmount("1");
+      setLowEnergyError(false);
     } catch (error) {
       console.error("Failed to give tribute:", error);
-      alert("Failed to give tribute. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -95,11 +97,11 @@ const Drops = () => {
 
   if (showVoting && currentVotingImage) {
     return (
-      <div className="max-w-md mx-auto space-y-6 pt-10 px-4">
+      <div className="max-w-6xl mx-auto space-y-6 pt-10 px-4">
         <div className="text-center space-y-2">
           <h2
             className={cn(
-              "text-3xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+              "text-5xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
               getDropTitleGradient(dailyDrop.images.length),
             )}
           >
@@ -110,39 +112,58 @@ const Drops = () => {
           </p>
         </div>
 
-        <div className="relative rounded-xl overflow-hidden border-2 border-white/5 bg-black/20 shadow-xl flex justify-center">
-          <img
-            src={currentVotingImage.url ?? ""}
-            alt={`Drop ${firstUnvotedIndex + 1}`}
-            className="h-[60vh] w-auto max-w-full object-contain"
-          />
-        </div>
-
-        <div className="space-y-4 p-4 bg-secondary/10 rounded-xl border border-white/5">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Your Energy</span>
-            <span className="font-mono font-bold text-accent-foreground flex items-center gap-2">
-              {dailyDrop.userState?.energy ?? 0}{" "}
-              <AnimeEnergyIcon className="w-4 h-4" />
-            </span>
+        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+          <div className="relative rounded-xl overflow-hidden border-2 border-white/5 bg-black/20 shadow-xl flex justify-center flex-1 w-full max-w-3xl">
+            <img
+              src={currentVotingImage.url ?? ""}
+              alt={`Drop ${firstUnvotedIndex + 1}`}
+              className="h-[70vh] w-auto max-w-full object-contain"
+            />
           </div>
 
-          <div className="flex flex-col gap-4">
-            <Input
-              type="number"
-              min="1"
-              max={dailyDrop.userState?.energy ?? 1}
-              value={tributeAmount}
-              onChange={(e) => setTributeAmount(e.target.value)}
-              className="font-mono text-center text-2xl h-14 bg-black/50 border-white/10 w-full"
-            />
-            <Button
-              onClick={handleTribute}
-              disabled={isSubmitting}
-              className="w-full font-bold tracking-wide h-12"
-            >
-              {isSubmitting ? "CUMMING..." : "GIVE TRIBUTE"}
-            </Button>
+          <div className="space-y-4 p-6 bg-secondary/10 rounded-xl border border-white/5 w-full lg:w-96 shrink-0 lg:sticky lg:top-24 backdrop-blur-sm">
+            <div className="flex justify-between items-center text-sm border-b border-white/5 pb-4">
+              <span className="text-muted-foreground font-medium">Your Energy</span>
+              <span className="font-mono font-bold text-accent-foreground flex items-center gap-2 text-lg">
+                {dailyDrop.userState?.energy ?? 0}{" "}
+                <AnimeEnergyIcon className="w-5 h-5" />
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Tribute Amount</label>
+                <Input
+                  type="number"
+                  min="1"
+                  max={dailyDrop.userState?.energy ?? 1}
+                  value={tributeAmount}
+                  onChange={(e) => {
+                    setTributeAmount(e.target.value);
+                    setLowEnergyError(false);
+                  }}
+                  className="font-mono text-center text-3xl h-16 bg-black/50 border-white/10 w-full focus:border-primary/50 transition-colors"
+                />
+              </div>
+              <Button
+                onClick={handleTribute}
+                disabled={isSubmitting}
+                className={cn(
+                  "w-full font-black tracking-widest h-14 text-lg shadow-lg transition-all active:scale-[0.98]",
+                  lowEnergyError
+                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-destructive/20"
+                    : "shadow-primary/20 hover:scale-[1.02]"
+                )}
+              >
+                {isSubmitting ? (
+                  "CUMMING..."
+                ) : (
+                  <MorphingText className="font-black tracking-widest">
+                    {lowEnergyError ? "NOT ENOUGH ENERGY!" : "GIVE TRIBUTE"}
+                  </MorphingText>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -189,9 +210,9 @@ const Drops = () => {
                 "group relative rounded-xl overflow-hidden border-2 transition-all duration-300 hover:-translate-y-1",
                 isVoted
                   ? cn(
-                      getDropImageGlow(dailyDrop.images.length),
-                      "border-white/5 bg-black/20",
-                    )
+                    getDropImageGlow(dailyDrop.images.length),
+                    "border-white/5 bg-black/20",
+                  )
                   : "grayscale opacity-60 border-white/5 bg-black/50 hover:opacity-100",
               )}
             >
