@@ -263,7 +263,7 @@ const Page = () => {
                 className="w-full h-96 object-contain transition-transform duration-500 group-hover:scale-110"
               />
 
-              <div className="absolute bottom-0 left-0 w-full p-4 font-bold bg-linear-to-t from-background/90 to-background/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <div className="absolute bottom-0 left-0 w-full p-4 font-bold bg-linear-to-t from-background/90 to-background/30 translate-y-0 xl:translate-y-full xl:group-hover:translate-y-0 transition-transform duration-300">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-primary">
                     My Tributes
