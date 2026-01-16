@@ -94,10 +94,10 @@ const Navbar = () => {
   ];
 
   return (
-    <div className="sticky top-0 left-0 flex items-center justify-between px-6 py-4 border-b border-border/50 bg-background/95 backdrop-blur-sm z-50">
-      <div className="flex items-center gap-8">
+    <div className="sticky top-0 left-0 flex items-center justify-between px-4 md:px-6 py-4 border-b border-border/50 bg-background/95 backdrop-blur-sm z-50">
+      <div className="flex items-center gap-4 md:gap-8">
         <Logo />
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-2 md:gap-6">
           {navLinks.map((link) => {
             const isActive = pathname === link.url;
             return (
@@ -122,7 +122,7 @@ const Navbar = () => {
                 >
                   {link.icon}
                 </span>
-                <span className="font-semibold text-sm tracking-wide z-10">
+                <span className="hidden md:block font-semibold text-sm tracking-wide z-10">
                   {link.name}
                 </span>
                 {isActive && (

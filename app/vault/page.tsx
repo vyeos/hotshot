@@ -141,7 +141,7 @@ export default function VaultPage() {
                       <div
                         className={cn(
                           "relative w-full",
-                          isWinner ? "h-100" : "h-60",
+                          isWinner ? "h-96" : "h-60",
                         )}
                       >
                         <img

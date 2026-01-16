@@ -76,7 +76,7 @@ const page = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-muted/30 p-4">
       <div
-        className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
+        className={`w-full max-w-md space-y-8 bg-card border border-border rounded-xl shadow-lg p-6 md:p-8 ${isShaking && "animate-shake"} ${errors && "border-destructive"}`}
       >
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">

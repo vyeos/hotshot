@@ -132,7 +132,7 @@ const Page = () => {
         <div className="text-center space-y-2">
           <h2
             className={cn(
-              "text-5xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+              "text-3xl md:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
               getDropTitleGradient(dailyDrop.images.length),
             )}
           >
@@ -148,7 +148,7 @@ const Page = () => {
             <img
               src={currentVotingImage.url ?? ""}
               alt={`Drop ${firstUnvotedIndex + 1}`}
-              className="h-[70vh] w-auto max-w-full object-contain"
+              className="h-[50vh] lg:h-[70vh] w-auto max-w-full object-contain"
             />
           </div>
 
@@ -260,7 +260,7 @@ const Page = () => {
               <img
                 src={img.url ?? ""}
                 alt={`Drop ${idx + 1}`}
-                className="w-full h-150 object-contain transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-96 object-contain transition-transform duration-500 group-hover:scale-110"
               />
 
               <div className="absolute bottom-0 left-0 w-full p-4 font-bold bg-linear-to-t from-background/90 to-background/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
