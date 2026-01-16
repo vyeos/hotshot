@@ -9,7 +9,15 @@ export const currentUser = query({
     if (!userId) {
       return null;
     }
-    return await ctx.db.get(userId);
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      return null;
+    }
+    return {
+      ...user,
+      daily_allowance: user.daily_allowance ?? 20,
+      energy: user.energy ?? 20,
+    };
   },
 });
 
@@ -68,8 +76,8 @@ export const checkEnergyRefill = mutation({
     const today = new Date().toISOString().split("T")[0];
 
     if (user.lastRefillDate !== today) {
-      const dailyAllowance = user.daily_allowance ?? 20; 
-      const currentEnergy = user.energy ?? 0; 
+      const dailyAllowance = user.daily_allowance ?? 20;
+      const currentEnergy = user.energy ?? 0;
 
       await ctx.db.patch(userId, {
         energy: currentEnergy + dailyAllowance,
