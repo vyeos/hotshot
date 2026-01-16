@@ -95,7 +95,7 @@ export const giveTribute = mutation({
     const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
 
-    if (user.energy < args.amount) {
+    if ((user.energy ?? 20) < args.amount) {
       throw new Error("Not enough energy");
     }
 
@@ -109,7 +109,7 @@ export const giveTribute = mutation({
 
     // Deduct energy
     await ctx.db.patch(userId, {
-      energy: user.energy - args.amount,
+      energy: (user.energy ?? 20) - args.amount,
     });
 
     await ctx.db.patch(args.imageId, {
@@ -175,7 +175,7 @@ export const getDailyDrop = query({
         }
 
         userState = {
-          energy: user.energy,
+          energy: user.energy ?? 20,
           tributes,
         };
       }
