@@ -22,24 +22,28 @@ export default function SenpaiDashboard() {
   const createDrop = useMutation(api.daily_drops.create);
   const isDropped = useQuery(api.daily_drops.getDailyDrop);
 
+  const updateDrop = useMutation(api.daily_drops.update);
+  const futureDrops = useQuery(api.daily_drops.getUpcomingDrops);
+
   const [title, setTitle] = useState("");
+  const [scheduledDate, setScheduledDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
+  });
+
   const [images, setImages] = useState<(File | null)[]>([
-    null,
-    null,
-    null,
-    null,
-    null,
+    null, null, null, null, null,
   ]);
   const [previews, setPreviews] = useState<(string | null)[]>([
-    null,
-    null,
-    null,
-    null,
-    null,
+    null, null, null, null, null,
   ]);
+
+  const [editingDropId, setEditingDropId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [titleError, setTitleError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -50,10 +54,39 @@ export default function SenpaiDashboard() {
     notFound();
   }
 
+  const handleEditSelect = (drop: NonNullable<typeof futureDrops>[number]) => {
+    setTitle(drop.title);
+    setScheduledDate(drop.date);
+    setEditingDropId(drop._id);
+    setErrorMessage("");
+
+    const newPreviews = [null, null, null, null, null] as (string | null)[];
+    drop.images.forEach((img, idx) => {
+      if (idx < 5) newPreviews[idx] = img.url;
+    });
+    setPreviews(newPreviews);
+    setImages([null, null, null, null, null]);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => {
+    setTitle("");
+    setEditingDropId(null);
+    setPreviews([null, null, null, null, null]);
+    setImages([null, null, null, null, null]);
+    setErrorMessage("");
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setScheduledDate(tomorrow.toISOString().split("T")[0]);
+  };
+
   const handleImageSelect = (
     index: number,
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    setErrorMessage("");
     const file = e.target.files?.[0];
     if (file) {
       const newImages = [...images];
@@ -62,19 +95,24 @@ export default function SenpaiDashboard() {
 
       const objectUrl = URL.createObjectURL(file);
       const newPreviews = [...previews];
-      if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]!);
+      if (newPreviews[index] && newPreviews[index]!.startsWith("blob:")) {
+        URL.revokeObjectURL(newPreviews[index]!);
+      }
       newPreviews[index] = objectUrl;
       setPreviews(newPreviews);
     }
   };
 
   const removeImage = (index: number) => {
+    setErrorMessage("");
     const newImages = [...images];
     newImages[index] = null;
     setImages(newImages);
 
     const newPreviews = [...previews];
-    if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]!);
+    if (newPreviews[index] && newPreviews[index]!.startsWith("blob:")) {
+      URL.revokeObjectURL(newPreviews[index]!);
+    }
     newPreviews[index] = null;
     setPreviews(newPreviews);
 
@@ -84,12 +122,34 @@ export default function SenpaiDashboard() {
   };
 
   const handleSubmit = async () => {
+    setErrorMessage("");
     if (!title) {
       setTitleError(true);
       return;
     }
 
     const activeImages = images.filter((img): img is File => img !== null);
+    const hasNewImages = activeImages.length > 0;
+
+    if (editingDropId && !hasNewImages) {
+      setIsUploading(true);
+      try {
+        await updateDrop({
+          dropId: editingDropId as any,
+          title,
+          date: scheduledDate,
+        });
+        setIsSuccess(true);
+        setTimeout(() => setIsSuccess(false), 3000);
+        cancelEdit();
+      } catch (error) {
+        console.error(error);
+        setErrorMessage("Failed to update drop");
+      } finally {
+        setIsUploading(false);
+      }
+      return;
+    }
 
     setIsUploading(true);
     try {
@@ -106,20 +166,28 @@ export default function SenpaiDashboard() {
         }),
       );
 
-      await createDrop({
-        title,
-        imageStorageIds: storageIds,
-      });
+      if (editingDropId) {
+        await updateDrop({
+          dropId: editingDropId as any,
+          title,
+          date: scheduledDate,
+          imageStorageIds: storageIds,
+        });
+      } else {
+        await createDrop({
+          title,
+          imageStorageIds: storageIds,
+          date: scheduledDate,
+        });
+      }
 
       setIsSuccess(true);
       setTimeout(() => setIsSuccess(false), 3000);
 
-      setTitle("");
-      setImages([null, null, null, null, null]);
-      setPreviews([null, null, null, null, null]);
+      cancelEdit(); // Resets form
     } catch (error) {
       console.error(error);
-      alert("Failed to create drop");
+      setErrorMessage("Failed to save drop");
     } finally {
       setIsUploading(false);
     }
@@ -133,67 +201,74 @@ export default function SenpaiDashboard() {
     );
   }
 
-  if (isDropped) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8 px-4">
-        <div className="space-y-2">
-          <h1 className="px-6 text-5xl md:text-6xl font-black italic tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-500 to-pink-500 drop-shadow-2xl">
-            WAIFUS UNLEASHED!
-          </h1>
-          <p className="text-2xl font-bold text-white/80">
-            Today's drop is live, Senpai.
-          </p>
+  const activeDropInfo = isDropped ? (
+    <div className="flex flex-col items-center justify-center py-10 space-y-4 border-b border-white/10 mb-10">
+      <h2 className="pr-2 text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-500 to-pink-500">
+        LIVE DROP ACTIVE
+      </h2>
+      <div className="flex gap-4 items-center">
+        <div className="px-4 py-2 bg-secondary/10 rounded border border-white/5">
+          <span className="text-muted-foreground uppercase text-xs font-bold mr-2">Title</span>
+          <span className="font-bold text-primary">{isDropped.title}</span>
         </div>
-
-        <Card className="w-full max-w-md bg-black/20 border-primary/20 backdrop-blur-sm">
-          <CardContent className="p-6 space-y-4">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground uppercase tracking-widest font-bold">Current Drop</p>
-              <p className="text-2xl font-bold text-primary">"{isDropped.title}"</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="p-3 rounded-lg bg-secondary/10 border border-white/5">
-                <p className="text-2xl font-mono font-bold">{isDropped.images.length}</p>
-                <p className="text-xs text-muted-foreground font-bold uppercase">Images</p>
-              </div>
-              <div className="p-3 rounded-lg bg-secondary/10 border border-white/5">
-                <p className="text-2xl font-mono font-bold">{isDropped.date.split("-").reverse().join("/")}</p>
-                <p className="text-xs text-muted-foreground font-bold uppercase">Date</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <Link href="/">
-          <Button size="lg" className="h-14 px-8 text-lg font-black tracking-wide shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-            VIEW LIVE DROP
-          </Button>
+          <Button size="sm" variant="outline">View</Button>
         </Link>
       </div>
-    );
-  }
+    </div>
+  ) : null;
 
   const hasImages = images.filter((img) => img !== null).length > 0;
+  const canSubmit = editingDropId ? true : hasImages;
 
   return (
     <div className="container mx-auto max-w-4xl py-10 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-primary">
-        Create Daily Drop
-      </h1>
+      {activeDropInfo}
+
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-primary">
+          {editingDropId ? "Edit Scheduled Drop" : "Create Daily Drop"}
+        </h1>
+        {editingDropId && (
+          <Button variant="ghost" onClick={cancelEdit} className="text-muted-foreground hover:text-white">
+            Cancel Edit
+          </Button>
+        )}
+      </div>
 
       <div className="space-y-8">
-        {/* Title Input */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Drop Title</label>
-          <Input
-            placeholder="e.g. Summer Beach Episode"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setTitleError(false);
-            }}
-            className="text-lg"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Title Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Drop Title</label>
+            <Input
+              placeholder="e.g. Summer Beach Episode"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                setTitleError(false);
+                setErrorMessage("");
+              }}
+              className="text-lg"
+            />
+          </div>
+
+          {/* Date Picker */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Scheduled Date</label>
+            <div className="relative">
+              <Input
+                type="date"
+                value={scheduledDate}
+                onChange={(e) => {
+                  setScheduledDate(e.target.value);
+                  setErrorMessage("");
+                }}
+                className="text-lg w-full [&::-webkit-calendar-picker-indicator]:invert"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Defaults to tomorrow. Today: {new Date().toISOString().split("T")[0]}</p>
+          </div>
         </div>
 
         {/* Image Grid */}
@@ -201,7 +276,10 @@ export default function SenpaiDashboard() {
           {images.map((_, index) => (
             <Card
               key={index}
-              className="relative aspect-auto border-dashed border-2 overflow-hidden flex flex-col group hover:border-primary transition-colors"
+              className={cn(
+                "relative aspect-auto border-dashed border-2 overflow-hidden flex flex-col group transition-colors",
+                editingDropId && !images[index] && previews[index] ? "border-primary/50 bg-primary/5" : "hover:border-primary"
+              )}
             >
               <CardContent className="p-0 h-full flex items-center justify-center bg-muted/20">
                 {previews[index] ? (
@@ -255,10 +333,10 @@ export default function SenpaiDashboard() {
             disabled={isUploading || isSuccess}
             className={cn(
               "w-full md:w-auto min-w-40",
-              !hasImages && !isSuccess && !isUploading &&
+              !canSubmit && !isSuccess && !isUploading &&
               "bg-destructive hover:bg-destructive/90",
               isSuccess && "bg-primary hover:bg-secondary text-secondary",
-              titleError && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
+              (titleError || errorMessage) && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
             )}
           >
             {isUploading ? (
@@ -269,17 +347,58 @@ export default function SenpaiDashboard() {
             ) : (
               <MorphingText className="font-bold">
                 {isSuccess
-                  ? "Daily Drop Created!"
-                  : titleError
-                    ? "PLEASE ENTER A TITLE"
-                    : !hasImages
-                      ? "Skip Drop (No Images)"
-                      : "Publish Drop"}
+                  ? (editingDropId ? "Drop Updated!" : "Scheduled!")
+                  : errorMessage
+                    ? errorMessage.toUpperCase()
+                    : titleError
+                      ? "PLEASE ENTER A TITLE"
+                      : !canSubmit
+                        ? "Add Images"
+                        : (editingDropId ? "Update Drop" : "Schedule Drop")}
               </MorphingText>
             )}
           </Button>
         </div>
       </div>
+
+      {/* Upcoming Drops Section */}
+      <div className="mt-20 pt-10 border-t border-white/10">
+        <h2 className="text-2xl font-black italic mb-6 text-muted-foreground">UPCOMING SCHEDULE</h2>
+
+        {!futureDrops ? (
+            <div className="flex justify-center py-8"><AnimeLoaderIcon className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+          ) : futureDrops.length === 0 ? (
+            <p className="text-muted-foreground">No future drops scheduled.</p>
+          ) : (
+            <div className="space-y-4">
+              {futureDrops.map(drop => (
+                <div
+                  key={drop._id}
+                  onClick={() => handleEditSelect(drop)}
+                  className={cn(
+                    "group flex items-center justify-between p-4 rounded-xl bg-secondary/5 border border-white/5 hover:bg-secondary/10 hover:border-primary/20 transition-all cursor-pointer",
+                    editingDropId === drop._id && "border-primary bg-primary/5"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-center justify-center w-16 h-16 bg-black/20 rounded-lg border border-white/5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">{new Date(drop.date).toLocaleString('default', { month: 'short' })}</span>
+                      <span className="text-2xl font-black text-primary">{new Date(drop.date).getDate()}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors">{drop.title}</h3>
+                      <p className="text-sm text-muted-foreground">{drop.images.length} Images</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100">
+                    Edit
+                  </Button>
+                </div>
+              ))}
+            </div>
+        )}
+      </div>
+
     </div>
   );
 }

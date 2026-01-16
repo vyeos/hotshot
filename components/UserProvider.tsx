@@ -2,8 +2,8 @@
 
 import { api } from "@/convex/_generated/api";
 import { FullScreenLoader } from "@/components/ui/AnimeLoader";
-import { useQuery } from "convex/react";
-import { createContext, useContext } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { createContext, useContext, useEffect } from "react";
 import { User } from "@/lib/types";
 
 type UserContextType = {
@@ -16,9 +16,16 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const user = useQuery(api.users.currentUser);
+  const checkEnergy = useMutation(api.users.checkEnergyRefill);
 
   const isLoading = user === undefined;
   const isAuthenticated = user !== null && !isLoading;
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkEnergy();
+    }
+  }, [isAuthenticated, checkEnergy]);
 
   if (isLoading) return <FullScreenLoader />;
 

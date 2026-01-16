@@ -55,3 +55,23 @@ export const setUsername = mutation({
     await ctx.db.patch(userId, { username: args.username });
   },
 });
+
+export const checkEnergyRefill = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return;
+
+    const user = await ctx.db.get(userId);
+    if (!user) return;
+
+    const today = new Date().toISOString().split("T")[0];
+
+    if (user.lastRefillDate !== today) {
+      await ctx.db.patch(userId, {
+        energy: (user.energy || 0) + (user.daily_allowance || 20),
+        lastRefillDate: today,
+      });
+    }
+  }
+});
