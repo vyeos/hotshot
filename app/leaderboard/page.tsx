@@ -136,7 +136,7 @@ export default function LeaderboardPage() {
               <img
                 src={second.url!}
                 alt="2nd Place"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               <div className="absolute top-2 left-2 bg-slate-400 text-black font-black px-3 py-1 rounded text-sm shadow-lg flex items-center gap-1">
                 <AnimeMedalIcon className="w-4 h-4" /> #2
@@ -158,7 +158,7 @@ export default function LeaderboardPage() {
               <img
                 src={first.url!}
                 alt="1st Place"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               <div className="absolute top-0 left-0 w-full bg-linear-to-b from-yellow-500/80 to-transparent p-4 flex justify-center">
                 <AnimeCrownIcon className="w-12 h-12 text-yellow-100 drop-shadow-md" />
@@ -183,7 +183,7 @@ export default function LeaderboardPage() {
               <img
                 src={third.url!}
                 alt="3rd Place"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               <div className="absolute top-2 left-2 bg-amber-700 text-white font-black px-3 py-1 rounded text-sm shadow-lg flex items-center gap-1">
                 <AnimeMedalIcon className="w-4 h-4" /> #3
@@ -219,7 +219,7 @@ export default function LeaderboardPage() {
                   <img
                     src={img.url!}
                     alt={`Rank ${idx + 4}`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
 
