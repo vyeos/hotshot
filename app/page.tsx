@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { cn } from "@/lib/utils";
 import { getDropTitleGradient, getDropImageGlow } from "@/lib/gradients";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import { MorphingText } from "@/components/ui/morphing-text";
 import Link from "next/link";
 
 const Page = () => {
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const dailyDrop = useQuery(api.daily_drops.getDailyDrop);
   const giveTribute = useMutation(api.daily_drops.giveTribute);
 
@@ -56,6 +57,35 @@ const Page = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (isAuthLoading) {
+    return (
+      <div className="h-screen w-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary flex items-center justify-center">
+          <div className="h-2 w-2 bg-primary rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4 space-y-6">
+        <div className="relative">
+          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+          <AnimeEnergyIcon className="w-24 h-24 text-muted-foreground relative z-10" />
+        </div>
+        <div className="space-y-2 max-w-md">
+          <h1 className="text-4xl font-black italic tracking-tighter text-primary">
+            LOCKED
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Please sign in to view today's specific drop and vote for your waifu!
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (dailyDrop === undefined) {
     return (
