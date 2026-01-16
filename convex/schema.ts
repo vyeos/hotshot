@@ -14,6 +14,7 @@ const schema = defineSchema({
     username: v.string(),
     daily_allowance: v.number(),
     energy: v.number(),
+    lastRefillDate: v.optional(v.string()),
   })
     .index("by_username", ["username"])
     .index("email", ["email"]),

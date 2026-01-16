@@ -10,5 +10,5 @@ export type User = {
     username: string;
     daily_allowance: number;
     energy: number;
-    isVirgin: boolean;
+    lastRefillDate?: string;
 };

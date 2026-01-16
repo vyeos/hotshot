@@ -17,6 +17,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           daily_allowance: 20,
           energy: 20,
           isVirgin: false,
+          lastRefillDate: new Date().toISOString().split("T")[0],
         };
       },
     }),
@@ -32,6 +33,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           daily_allowance: 20,
           energy: 20,
           isVirgin: false,
+          lastRefillDate: new Date().toISOString().split("T")[0],
         };
       },
     }),
@@ -45,6 +47,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           daily_allowance: 20,
           energy: 20,
           isVirgin: false,
+          lastRefillDate: new Date().toISOString().split("T")[0],
         };
       },
     }),
