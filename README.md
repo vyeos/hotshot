@@ -1,40 +1,80 @@
-# Welcome to your Convex + Next.js app
+# Hotshot 🔥
 
-This is a [Convex](https://convex.dev/) project created with [`npm create convex`](https://www.npmjs.com/package/create-convex).
+Hotshot is a high-octane, anime-themed web application built for community interaction. It features a unique energy-based economy, daily content drops, and a robust authentication system.
 
-After the initial setup (<2 minutes) you'll have a working full-stack app using:
+## 🌟 Features
 
-- Convex as your backend (database, server logic)
-- [React](https://react.dev/) as your frontend (web page interactivity)
-- [Next.js](https://nextjs.org/) for optimized web hosting and page routing
-- [Tailwind](https://tailwindcss.com/) for building great looking accessible UI
+- **Anime-Inspired UI**: A vibrant, dynamic interface with custom animations and a bold design language.
+- **Daily Drops**: Exclusive image drops that users can interact with.
+- **Tribute System**: Users can spend "Energy" to pay tribute to their favorite waifu.
+- **Smart Energy Economy**:
+  - Daily energy allowance and refills.
+  - Automatic energy regeneration logic.
+- **Robust Authentication**: Secure sign-up and login powered by **Convex Auth**, including:
+  - GitHub & Google OAuth
+  - Custom username and password
+- **Real-time Updates**: Instant data synchronization for leaderboards and user states using Convex.
 
-## Get started
+## 🛠️ Tech Stack
 
-If you just cloned this codebase and didn't use `npm create convex`, run:
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Backend & Database**: [Convex](https://convex.dev/)
+- **UI Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Components**: [Radix UI](https://www.radix-ui.com/)
+- **Animations**: `tw-animate-css`
 
-```
-npm install
-npm run dev
-```
+## 🚀 Getting Started
 
-If you're reading this README on GitHub and want to use this template, run:
+Follow these steps to get the project running locally:
 
-```
-npm create convex@latest -- -t nextjs
-```
+### Prerequisites
 
-## Learn more
+- Node.js (v18 or higher)
+- bun
 
-To learn more about developing your project with Convex, check out:
+### Installation
 
-- The [Tour of Convex](https://docs.convex.dev/get-started) for a thorough introduction to Convex principles.
-- The rest of [Convex docs](https://docs.convex.dev/) to learn about all Convex features.
-- [Stack](https://stack.convex.dev/) for in-depth articles on advanced topics.
+1.  **Clone the repository:**
 
-## Join the community
+    ```bash
+    git clone https://github.com/yourusername/hotshot.git
+    cd hotshot
+    ```
 
-Join thousands of developers building full-stack apps with Convex:
+2.  **Install dependencies:**
 
-- Join the [Convex Discord community](https://convex.dev/community) to get help in real-time.
-- Follow [Convex on GitHub](https://github.com/get-convex/), star and contribute to the open-source implementation of Convex.
+    ```bash
+    bun install
+    ```
+
+3.  **Set up Environment Variables:**
+
+    Initialize your Convex project to generate the necessary environment variables in `.env.local`:
+
+    ```bash
+    npx convex dev
+    ```
+
+    This will configure `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL`.
+
+4.  **Start the development server:**
+
+    This command starts both the Next.js frontend and the Convex backend.
+
+    ```bash
+    bun dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 📂 Project Structure
+
+- `/app`: Next.js App Router pages and layouts.
+- `/convex`: Backend logic, schema, and authentication configuration.
+- `/components`: Reusable UI components.
+- `/public`: Static assets.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
