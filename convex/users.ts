@@ -68,9 +68,13 @@ export const checkEnergyRefill = mutation({
     const today = new Date().toISOString().split("T")[0];
 
     if (user.lastRefillDate !== today) {
+      const dailyAllowance = user.daily_allowance ?? 20; 
+      const currentEnergy = user.energy ?? 0; 
+
       await ctx.db.patch(userId, {
-        energy: (user.energy || 0) + (user.daily_allowance || 20),
+        energy: currentEnergy + dailyAllowance,
         lastRefillDate: today,
+        daily_allowance: dailyAllowance,
       });
     }
   }
