@@ -10,12 +10,10 @@ const schema = defineSchema({
     image: v.optional(v.string()),
     email: v.string(),
     emailVerificationTime: v.optional(v.number()),
-    isAnonymous: v.optional(v.boolean()),
 
     username: v.string(),
     daily_allowance: v.number(),
     energy: v.number(),
-    isVirgin: v.boolean(),
   })
     .index("by_username", ["username"])
     .index("email", ["email"]),

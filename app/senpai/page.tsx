@@ -43,6 +43,7 @@ export default function SenpaiDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [titleError, setTitleError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -57,6 +58,7 @@ export default function SenpaiDashboard() {
     setTitle(drop.title);
     setScheduledDate(drop.date);
     setEditingDropId(drop._id);
+    setErrorMessage("");
 
     const newPreviews = [null, null, null, null, null] as (string | null)[];
     drop.images.forEach((img, idx) => {
@@ -73,6 +75,7 @@ export default function SenpaiDashboard() {
     setEditingDropId(null);
     setPreviews([null, null, null, null, null]);
     setImages([null, null, null, null, null]);
+    setErrorMessage("");
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -83,6 +86,7 @@ export default function SenpaiDashboard() {
     index: number,
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    setErrorMessage("");
     const file = e.target.files?.[0];
     if (file) {
       const newImages = [...images];
@@ -100,6 +104,7 @@ export default function SenpaiDashboard() {
   };
 
   const removeImage = (index: number) => {
+    setErrorMessage("");
     const newImages = [...images];
     newImages[index] = null;
     setImages(newImages);
@@ -117,6 +122,7 @@ export default function SenpaiDashboard() {
   };
 
   const handleSubmit = async () => {
+    setErrorMessage("");
     if (!title) {
       setTitleError(true);
       return;
@@ -138,7 +144,7 @@ export default function SenpaiDashboard() {
         cancelEdit();
       } catch (error) {
         console.error(error);
-        alert("Failed to update drop");
+        setErrorMessage("Failed to update drop");
       } finally {
         setIsUploading(false);
       }
@@ -181,7 +187,7 @@ export default function SenpaiDashboard() {
       cancelEdit(); // Resets form
     } catch (error) {
       console.error(error);
-      alert("Failed to save drop");
+      setErrorMessage("Failed to save drop");
     } finally {
       setIsUploading(false);
     }
@@ -195,16 +201,12 @@ export default function SenpaiDashboard() {
     );
   }
 
-  // We only show the "Dropped" screen if there is an active drop AND we are not in edit mode
-  // But actually Senpai might want to see the creation form even if a drop is active (to schedule next ones).
-  // Let's modify the return logic to always show dashboard, maybe "Active Drop" info at top.
-
   const activeDropInfo = isDropped ? (
     <div className="flex flex-col items-center justify-center py-10 space-y-4 border-b border-white/10 mb-10">
-      <h2 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-500 to-pink-500">
+      <h2 className="pr-2 text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-500 to-pink-500">
         LIVE DROP ACTIVE
       </h2>
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         <div className="px-4 py-2 bg-secondary/10 rounded border border-white/5">
           <span className="text-muted-foreground uppercase text-xs font-bold mr-2">Title</span>
           <span className="font-bold text-primary">{isDropped.title}</span>
@@ -245,6 +247,7 @@ export default function SenpaiDashboard() {
               onChange={(e) => {
                 setTitle(e.target.value);
                 setTitleError(false);
+                setErrorMessage("");
               }}
               className="text-lg"
             />
@@ -257,7 +260,10 @@ export default function SenpaiDashboard() {
               <Input
                 type="date"
                 value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
+                onChange={(e) => {
+                  setScheduledDate(e.target.value);
+                  setErrorMessage("");
+                }}
                 className="text-lg w-full [&::-webkit-calendar-picker-indicator]:invert"
               />
             </div>
@@ -330,7 +336,7 @@ export default function SenpaiDashboard() {
               !canSubmit && !isSuccess && !isUploading &&
               "bg-destructive hover:bg-destructive/90",
               isSuccess && "bg-primary hover:bg-secondary text-secondary",
-              titleError && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
+              (titleError || errorMessage) && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
             )}
           >
             {isUploading ? (
@@ -342,11 +348,13 @@ export default function SenpaiDashboard() {
               <MorphingText className="font-bold">
                 {isSuccess
                   ? (editingDropId ? "Drop Updated!" : "Scheduled!")
-                  : titleError
-                    ? "PLEASE ENTER A TITLE"
-                    : !canSubmit
-                      ? "Add Images"
-                      : (editingDropId ? "Update Drop" : "Schedule Drop")}
+                  : errorMessage
+                    ? errorMessage.toUpperCase()
+                    : titleError
+                      ? "PLEASE ENTER A TITLE"
+                      : !canSubmit
+                        ? "Add Images"
+                        : (editingDropId ? "Update Drop" : "Schedule Drop")}
               </MorphingText>
             )}
           </Button>
@@ -358,36 +366,36 @@ export default function SenpaiDashboard() {
         <h2 className="text-2xl font-black italic mb-6 text-muted-foreground">UPCOMING SCHEDULE</h2>
 
         {!futureDrops ? (
-          <div className="flex justify-center py-8"><AnimeLoaderIcon className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-        ) : futureDrops.length === 0 ? (
-          <p className="text-muted-foreground">No future drops scheduled.</p>
-        ) : (
-          <div className="space-y-4">
-            {futureDrops.map(drop => (
-              <div
-                key={drop._id}
-                onClick={() => handleEditSelect(drop)}
-                className={cn(
-                  "group flex items-center justify-between p-4 rounded-xl bg-secondary/5 border border-white/5 hover:bg-secondary/10 hover:border-primary/20 transition-all cursor-pointer",
-                  editingDropId === drop._id && "border-primary bg-primary/5"
-                )}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col items-center justify-center w-16 h-16 bg-black/20 rounded-lg border border-white/5">
-                    <span className="text-xs font-bold text-muted-foreground uppercase">{new Date(drop.date).toLocaleString('default', { month: 'short' })}</span>
-                    <span className="text-2xl font-black text-primary">{new Date(drop.date).getDate()}</span>
+            <div className="flex justify-center py-8"><AnimeLoaderIcon className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+          ) : futureDrops.length === 0 ? (
+            <p className="text-muted-foreground">No future drops scheduled.</p>
+          ) : (
+            <div className="space-y-4">
+              {futureDrops.map(drop => (
+                <div
+                  key={drop._id}
+                  onClick={() => handleEditSelect(drop)}
+                  className={cn(
+                    "group flex items-center justify-between p-4 rounded-xl bg-secondary/5 border border-white/5 hover:bg-secondary/10 hover:border-primary/20 transition-all cursor-pointer",
+                    editingDropId === drop._id && "border-primary bg-primary/5"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-center justify-center w-16 h-16 bg-black/20 rounded-lg border border-white/5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">{new Date(drop.date).toLocaleString('default', { month: 'short' })}</span>
+                      <span className="text-2xl font-black text-primary">{new Date(drop.date).getDate()}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors">{drop.title}</h3>
+                      <p className="text-sm text-muted-foreground">{drop.images.length} Images</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors">{drop.title}</h3>
-                    <p className="text-sm text-muted-foreground">{drop.images.length} Images</p>
-                  </div>
+                  <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100">
+                    Edit
+                  </Button>
                 </div>
-                <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100">
-                  Edit
-                </Button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
         )}
       </div>
 
