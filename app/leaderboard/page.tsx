@@ -70,7 +70,9 @@ export default function LeaderboardPage() {
     votedImageIds.has(img._id),
   );
 
-  if (!isCompleted) {
+  const isZeroEnergy = dailyDrop.userState?.energy === 0;
+
+  if (!isCompleted && !isZeroEnergy) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4 space-y-6">
         <div className="relative">
